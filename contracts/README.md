@@ -20,6 +20,14 @@ Setelah deploy, verifikasi source kontrak di BscScan. Mint hanya dibuka saat own
 4. Jalankan `npm run compile` dan `npm test`. Untuk deployment lokal, jalankan `npm run deploy` setelah pengujian testnet; preflight memeriksa field wajib, format, dan chain ID RPC. Simpan alamat kontrak, transaction hash, chain ID, alamat owner, dan tautan explorer.
 5. Jangan commit `contracts/.env` atau membagikan private key. Uji pada BSC Testnet dan periksa hasilnya sebelum deployment mainnet.
 
+### Deploy dan kontrol lewat halaman owner
+
+Setelah GitHub Pages selesai dibangun, buka `https://npcshood.xyz/deploy.html` (atau `https://docklin-app.github.io/Npc-hood/deploy.html`), pilih BSC Mainnet atau Testnet, lalu hubungkan wallet. Masukkan Base URI metadata HTTPS yang berakhiran `/`; halaman meminta wallet menandatangani deployment. Halaman tidak meminta atau mengirim private key, dan kontrak yang baru dibuat diverifikasi tetap `mintOpen() == false`. Simpan alamat kontrak dan periksa tautan explorer.
+
+Bagian **Owner Controls** dapat membaca status kontrak dan hanya mengaktifkan tombol buka/tutup mint jika wallet terhubung cocok dengan `owner()` on-chain. Membuka mint memerlukan konfirmasi halaman serta tanda tangan transaksi tersendiri; deployment tidak pernah membuka mint otomatis. Uji dahulu di BSC Testnet dan pastikan URI metadata untuk seluruh item siap sebelum Mainnet.
+
+Artifact browser (`client/src/lib/npcHoodDeployArtifact.ts`) berisi ABI dan bytecode hasil kompilasi source. Workflow GitHub Pages selalu mengompilasi dan mengekspor ulang artifact sebelum build. Setelah mengubah kontrak secara lokal, jalankan `npm ci`, `npm run compile`, dan `npm run export:frontend` dari `contracts/` agar halaman deploy tidak memakai bytecode lama.
+
 ### Deploy manual melalui GitHub Actions
 
 Workflow [Deploy NPC HOOD to BNB Mainnet](https://github.com/Docklin-app/Npc-hood/actions/workflows/deploy-npc-hood-mainnet.yml) hanya berjalan ketika owner memilih **Run workflow** pada branch `main` dan mengetik `DEPLOY NPC HOOD TO BNB MAINNET`. Sebelum menjalankannya, siapkan GitHub Environment bernama `bsc-mainnet`, tambahkan approval reviewer yang sesuai, lalu isi environment secrets `NPC_HOOD_RPC_URL`, `NPC_HOOD_DEPLOYER_PRIVATE_KEY`, dan `NPC_HOOD_BASE_URI`. Chain ID dikunci ke `56`. Workflow memeriksa audit dependensi, lalu mengompilasi dan menjalankan tes kontrak sebelum deploy; workflow tidak pernah memanggil `setMintOpen(true)`. Jika audit menemukan advisory high atau critical, workflow berhenti sebelum menggunakan RPC dan private key.

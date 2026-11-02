@@ -53,6 +53,8 @@ jobs:
         run: npm audit --audit-level=high
 
       - name: Compile and run contract tests
+        env:
+          HARDHAT_DISABLE_TELEMETRY_PROMPT: "true"
         run: |
           npm run compile
           npm test

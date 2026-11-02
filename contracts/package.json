@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "export:frontend": "node scripts/export-frontend-artifact.cjs",
     "deploy": "node scripts/preflight.cjs && hardhat run scripts/deploy.cjs --network npcHood"
   },
   "devDependencies": {

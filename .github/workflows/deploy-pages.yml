@@ -39,6 +39,16 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Install contract compiler dependencies
+        working-directory: contracts
+        run: npm ci
+
+      - name: Compile contract and sync wallet deploy artifact
+        working-directory: contracts
+        env:
+          HARDHAT_DISABLE_TELEMETRY_PROMPT: "true"
+        run: npm run compile && npm run export:frontend
+
       - name: Build static frontend
         env:
           VITE_NPC_HOOD_CHAIN_ID: ${{ vars.VITE_NPC_HOOD_CHAIN_ID }}
@@ -52,7 +62,7 @@ jobs:
         run: cp CNAME dist/public/CNAME
 
       - name: Verify Pages artifact
-        run: test -s dist/public/index.html && test "$(cat dist/public/CNAME)" = "npcshood.xyz"
+        run: test -s dist/public/index.html && test -s dist/public/deploy.html && test "$(cat dist/public/CNAME)" = "npcshood.xyz"
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

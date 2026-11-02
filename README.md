@@ -37,4 +37,7 @@ Setelah alamat kontrak tersedia, isi `.env.local` dari `.env.example` pada root 
 
 ## NPC HOOD — 10,000 NFT assets
 
-The generated collection is in `nft-collection/`: `collection/images/` contains 10,000 pixel-art PNGs, `collection/metadata/` contains matching token metadata files for IDs 1–10,000, and `collection/manifest.csv` lists their traits. A downloadable bundle is included as `nft-collection/NPC_HOOD_10000_NFTs.zip`; the reproducible generator and upload instructions are alongside it. Before minting, upload the image folder to IPFS, replace the placeholder image CID in metadata, then upload the metadata folder and use its URI as the contract Base URI. Metadata filenames intentionally have no extension to match `tokenURI = base URI + token ID`.
+The generated collection is in `nft-collection/`: `collection/images/` contains 10,000 pixel-art PNGs, `collection/metadata/` contains matching token metadata files for IDs 1–10,000, and `collection/manifest.csv` lists their traits. The bundle ZIP, reproducible generator, and upload instructions are alongside the assets. Metadata filenames intentionally have no extension to match `tokenURI = base URI + token ID`.
+
+
+**Status hosting metadata saat ini:** 10.000 metadata telah diatur ke URL gambar HTTPS publik yang merujuk ke commit aset tetap `50ec59243a7479bc69249331c39daeedb83405c3`. Ini adalah fallback GitHub Raw, **bukan IPFS** dan tidak menghasilkan CID. Base URI metadata untuk file di branch `main` adalah `https://raw.githubusercontent.com/Docklin-app/Npc-hood/main/nft-collection/collection/metadata/`; kontrak menambahkan ID token tanpa ekstensi. Untuk IPFS, pin folder gambar dan metadata dengan layanan pinning, lalu jalankan generator dengan `--image-base ipfs://<IMAGE_CID>`.

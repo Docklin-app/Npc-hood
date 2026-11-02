@@ -16,10 +16,15 @@ UPLOAD FOR THE CONTRACT
 5. Test token IDs 1 and 10000 in a wallet/marketplace before opening mint.
 
 CURRENT IMAGE URI PREFIX
-ipfs://REPLACE_WITH_IMAGES_CID
+https://raw.githubusercontent.com/Docklin-app/Npc-hood/50ec59243a7479bc69249331c39daeedb83405c3/nft-collection/collection/images
 
 IMPORTANT
 - Image and metadata folders are separate so image URIs can reference their own IPFS directory CID.
 - Replace the example image CID before publishing. Never point a live contract at a temporary/local folder.
 - This archive does not deploy a contract, upload to IPFS, or open mint.
 - Images were generated from procedural primitives and trait combinations; the script and seed make the collection reproducible.
+
+CURRENT HOSTING MODE
+The 10,000 metadata files currently point to public HTTPS image URLs pinned to asset commit 50ec59243a7479bc69249331c39daeedb83405c3. This is GitHub Raw hosting, not IPFS; there is no IPFS CID. The metadata Base URI on the public main branch is:
+https://raw.githubusercontent.com/Docklin-app/Npc-hood/main/nft-collection/collection/metadata/
+GitHub Raw is centralized hosting and can be subject to service availability or repository changes. To migrate to IPFS, pin both folders and regenerate metadata with --image-base ipfs://<IMAGE_CID>/.

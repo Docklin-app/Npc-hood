@@ -1,7 +1,7 @@
 {
   "name": "NPC HOOD #5906 — Wayfinder",
   "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
-  "image": "ipfs://REPLACE_WITH_IMAGES_CID/5906.png",
+  "image": "https://raw.githubusercontent.com/Docklin-app/Npc-hood/50ec59243a7479bc69249331c39daeedb83405c3/nft-collection/collection/images/5906.png",
   "external_url": "https://npcshood.xyz/",
   "attributes": [
     {

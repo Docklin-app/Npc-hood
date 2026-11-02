@@ -396,7 +396,7 @@ export default function Home() {
 
         <section className="collection-section" id="collection">
           <div className="collection-heading">
-            <div><span className="section-kicker">FIELD NOTES / 001—003</span><h2>More than<br /><em>background.</em></h2></div>
+            <div><span className="section-kicker">FIELD NOTES / 001—003</span><h2>NFT<br /><em>Gallery</em></h2></div>
             <p>Mereka mungkin NPC di dunia lain.<br />Di sini, setiap karakter punya tempat.</p>
             <span className="collection-arrow">↓  SCROLL THE FILES</span>
           </div>

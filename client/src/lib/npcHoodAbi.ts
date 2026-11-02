@@ -10,8 +10,10 @@ export const NPC_HOOD_ABI = [
   "function freeMint(uint256 quantity) payable",
   "function paidMint(uint256 quantity) payable",
   "function setMintOpen(bool isOpen)",
+  "function setCollectionBaseURI(string newBaseURI)",
   "function withdraw()",
   "function owner() view returns (address)",
   "event NpcHoodMinted(address indexed minter, uint256 quantity, bool paid, uint256 amountPaid)",
   "event ProceedsWithdrawn(address indexed recipient, uint256 amount)",
+  "event CollectionBaseURIChanged(string newBaseURI)",
 ] as const;

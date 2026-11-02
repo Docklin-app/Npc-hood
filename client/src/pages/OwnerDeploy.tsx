@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract, ContractFactory, formatEther, isAddress, parseEther, type InterfaceAbi } from "ethers";
+import { BrowserProvider, Contract, ContractFactory, formatEther, isAddress, parseEther, type InterfaceAbi, type Log, type LogDescription } from "ethers";
 import { useState } from "react";
 import { ArrowLeft, ArrowUpRight, Check, ExternalLink, ShieldCheck, Wallet } from "lucide-react";
 import { NPC_HOOD_ABI } from "@/lib/npcHoodAbi";
@@ -26,6 +26,8 @@ const NETWORKS: Network[] = [
   { chainId: 97, name: "BNB Smart Chain Testnet", symbol: "tBNB", explorer: "https://testnet.bscscan.com" },
 ];
 
+const DEFAULT_COLLECTION_BASE_URI = "https://raw.githubusercontent.com/Docklin-app/Npc-hood/1289970d7ee7629ce8e546a0ec33fab2dcaad56b/nft-collection/collection/metadata/";
+
 function errorMessage(error: unknown) {
   if (error && typeof error === "object" && "shortMessage" in error) {
     return String((error as { shortMessage: string }).shortMessage);
@@ -43,6 +45,7 @@ export default function OwnerDeploy() {
   const [walletAddress, setWalletAddress] = useState("");
   const [walletChainId, setWalletChainId] = useState<number | null>(null);
   const [metadataUri, setMetadataUri] = useState("");
+  const [updatedBaseUri, setUpdatedBaseUri] = useState(DEFAULT_COLLECTION_BASE_URI);
   const [contractInput, setContractInput] = useState("");
   const [contractAddress, setContractAddress] = useState("");
   const [contractStatus, setContractStatus] = useState<ContractStatus | null>(null);
@@ -233,6 +236,73 @@ export default function OwnerDeploy() {
     }
   };
 
+  const updateCollectionBaseUri = async () => {
+    if (!contractAddress || !contractStatus) {
+      setStatusMessage("Muat alamat kontrak terlebih dahulu.");
+      return;
+    }
+
+    const uri = updatedBaseUri.trim();
+    let parsedUri: URL;
+    try {
+      parsedUri = new URL(uri);
+    } catch {
+      setStatusMessage("Masukkan Base URI HTTPS yang valid dan diakhiri tanda garis miring /.");
+      return;
+    }
+    if (parsedUri.protocol !== "https:" || !parsedUri.hostname || !uri.endsWith("/") || parsedUri.search || parsedUri.hash || parsedUri.username || parsedUri.password) {
+      setStatusMessage("Base URI harus berupa HTTPS yang valid, tanpa query atau fragment, dan diakhiri /.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Perbarui Base URI kontrak NPC HOOD ini?\n\nURI baru:\n${uri}\n\nPerubahan ini berlaku untuk metadata seluruh koleksi. Wallet akan meminta persetujuan dan gas. Lanjutkan?`,
+    );
+    if (!confirmed) return;
+
+    setBusy(true);
+    setTxHash("");
+    try {
+      const provider = getProvider();
+      const chain = await provider.getNetwork();
+      if (Number(chain.chainId) !== selectedChainId) throw new Error(`Pilih ${network.name} di wallet sebelum mengubah Base URI.`);
+
+      const signer = await provider.getSigner();
+      const signerAddress = await signer.getAddress();
+      const contract = new Contract(contractAddress, NPC_HOOD_ABI, signer);
+      const currentOwner = String(await contract.owner());
+      if (signerAddress.toLowerCase() !== currentOwner.toLowerCase()) {
+        throw new Error(`Wallet aktif bukan owner kontrak. Owner: ${currentOwner}`);
+      }
+
+      await contract.setCollectionBaseURI.staticCall(uri);
+      const tx = await contract.setCollectionBaseURI(uri);
+      setTxHash(tx.hash as string);
+      setStatusMessage("Permintaan perubahan Base URI dikirim. Tinjau dan setujui transaksi di wallet…");
+      const receipt = await tx.wait();
+      if (!receipt || receipt.status !== 1) throw new Error("Transaksi perubahan Base URI tidak berhasil dikonfirmasi.");
+
+      const changedEvent = receipt.logs
+        .map((log: Log) => {
+          try {
+            return contract.interface.parseLog(log);
+          } catch {
+            return null;
+          }
+        })
+        .find((event: LogDescription | null) => event?.name === "CollectionBaseURIChanged");
+      if (!changedEvent || changedEvent.args.newBaseURI !== uri) {
+        throw new Error("Transaksi terkonfirmasi, tetapi event Base URI yang diharapkan tidak ditemukan.");
+      }
+
+      setStatusMessage(`Base URI berhasil diperbarui untuk koleksi. URI: ${uri}`);
+    } catch (error) {
+      setStatusMessage(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <main className="owner-deploy-page">
       <header className="owner-deploy-header">
@@ -283,8 +353,8 @@ export default function OwnerDeploy() {
 
         <section className="owner-panel" aria-labelledby="manage-title">
           <div className="owner-panel-title"><span>03 / OWNER CONTROLS</span><span className="owner-panel-caption">OWNER ONLY</span></div>
-          <h2 id="manage-title">Status & kontrol mint</h2>
-          <p className="owner-panel-copy">Muat kontrak yang sudah dideploy untuk melihat owner dan statusnya. Hanya wallet owner yang dapat membuka atau menutup mint.</p>
+          <h2 id="manage-title">Status & kontrol kontrak</h2>
+          <p className="owner-panel-copy">Muat kontrak yang sudah dideploy untuk melihat statusnya. Wallet owner dapat mengubah Base URI dan mengatur mint.</p>
           <div className="owner-load-row">
             <label className="owner-field"><span>ALAMAT KONTRAK</span><input value={contractInput} onChange={(event) => setContractInput(event.target.value)} placeholder="0x..." spellCheck={false} /></label>
             <button className="owner-button owner-button-secondary" onClick={loadContract} disabled={busy || !walletAddress || !onSelectedNetwork}>Muat status</button>
@@ -298,6 +368,13 @@ export default function OwnerDeploy() {
               <div><span>FREE / PAID</span><strong>{contractStatus.freeFee} / {contractStatus.paidPrice} {network.symbol}</strong></div>
             </div>
             <div className="owner-owner-row"><span>OWNER ADDRESS</span><code>{contractStatus.owner}</code>{isOwner ? <span className="owner-badge"><Check size={12} /> WALLET OWNER</span> : <span className="owner-notice">Wallet terhubung bukan owner</span>}</div>
+            <div className="owner-base-uri-update">
+              <label className="owner-field"><span>BASE URI BARU — METADATA</span><input value={updatedBaseUri} onChange={(event) => setUpdatedBaseUri(event.target.value)} placeholder="https://.../metadata/" autoComplete="url" spellCheck={false} /></label>
+              <p className="owner-warning"><ShieldCheck size={14} /> Mengubah Base URI akan mengarahkan metadata seluruh koleksi ke URL ini. Jangan gunakan tombol Deploy untuk kontrak yang sudah ada.</p>
+              <button className="owner-button owner-button-secondary" onClick={updateCollectionBaseUri} disabled={busy || !isOwner || !onSelectedNetwork}>
+                {busy ? "MENUNGGU WALLET / JARINGAN…" : "Perbarui Base URI"}
+              </button>
+            </div>
             <div className="owner-control-actions">
               <button className="owner-button owner-button-primary" onClick={() => changeMintState(true)} disabled={busy || !isOwner || !onSelectedNetwork || contractStatus.mintOpen}>Buka mint manual</button>
               <button className="owner-button owner-button-danger" onClick={() => changeMintState(false)} disabled={busy || !isOwner || !onSelectedNetwork || !contractStatus.mintOpen}>Tutup mint</button>

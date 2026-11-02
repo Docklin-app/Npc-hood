@@ -1,6 +1,7 @@
 # NPC HOOD — ToDo
 
 - [x] **Landing page dan identitas:** Sediakan landing page responsif bertema green gold dengan nama NPC HOOD dan logo di kiri atas, serta navigasi menuju area utama halaman. Jadikan gambar karakter pixel-art berjubah hijau, bertopi hijau, berlatar kota senja yang dikirim pengguna sebagai visual hero.
+- [ ] **Deployment situs ke browser:** Terbitkan `dist/public` lewat GitHub Actions, pertahankan `CNAME` `npcshood.xyz`, ubah source GitHub Pages ke `GitHub Actions`, lalu verifikasi halaman dan aset di domain publik.
 - [ ] **Showcase koleksi:** Sediakan galeri/showcase variasi karakter pixel yang tetap sesuai konsep visual NPC HOOD dan aset gambar yang dilampirkan.
 - [x] **Supply dan panel mint:** Tampilkan total supply 10.000, jumlah NFT yang telah di-mint dari kontrak, sisa supply, pemilih jumlah NFT, harga/fee per opsi, dan status transaksi. Jangan mengarang jumlah mint saat kontrak belum dikonfigurasi.
 - [x] **Koneksi dan jaringan wallet:** Sediakan koneksi wallet Web3, deteksi jaringan yang dikonfigurasi, permintaan pergantian jaringan yang sesuai, serta tampilan alamat wallet yang terhubung.

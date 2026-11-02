@@ -17,6 +17,9 @@ Situs koleksi NFT 10.000 item bergaya orisinal, mengambil pola umum halaman mint
 - **Wordmark/logo:** wordmark NPC HOOD dengan emblem pixel berbentuk siluet tudung/daun di dalam kotak sudut tegas.
 - **Warna merek:** emerald `#1d563b` dipasangkan dengan gold `#e5b74e`.
 
+## Deployment situs ke browser
+Frontend dibangun sebagai situs statis ke `dist/public` dan diterbitkan melalui GitHub Pages menggunakan GitHub Actions. Workflow membangun dari lockfile dan mempertahankan file `CNAME` (`npcshood.xyz`) di artefak tanpa menerbitkan kredensial. GitHub Pages harus memakai source `GitHub Actions`; bila chain ID dan alamat kontrak belum tersedia, variabel mint tetap kosong agar transaksi live tetap nonaktif.
+
 ## Struktur proyek
 - `client/src/pages/Home.tsx` — landing page, wallet, tampilan supply, mint, dan state transaksi.
 - `client/src/index.css` — sistem visual responsif dan motion.

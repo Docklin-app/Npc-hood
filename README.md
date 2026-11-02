@@ -15,6 +15,11 @@ Start with the Webdev skill's default-template guide. Platform login, storage, p
 
 Platform configuration is readable and editable through `webdev.config`. Default settings are initial values, not enforced constraints. The agent may modify the files, commands and configuration or follow the flexible guide for another stack.
 
+## GitHub Pages deployment
+
+The workflow in `.github/workflows/deploy-pages.yml` builds the static frontend into `dist/public/` and deploys it to GitHub Pages after pushes to `main`. In the repository, set **Settings → Pages → Build and deployment → Source** to **GitHub Actions**. The workflow copies the root `CNAME` into the artifact so the configured custom domain `npcshood.xyz` is retained.
+
+After a real contract is deployed, set `VITE_NPC_HOOD_CHAIN_ID`, `VITE_NPC_HOOD_CHAIN_NAME`, `VITE_NPC_HOOD_CONTRACT_ADDRESS`, `VITE_NPC_HOOD_CURRENCY_SYMBOL`, and `VITE_NPC_HOOD_EXPLORER_URL` as GitHub Actions repository **Variables**. These values are public because Vite embeds them in browser code; never put private keys or deployer credentials there. If chain ID or contract address is absent, mint stays disabled.
 
 ## NPC HOOD — Website mint
 

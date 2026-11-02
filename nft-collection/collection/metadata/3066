@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #3066 — Night Drifter",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/3066.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Night Drifter"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Patchwork Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Mask of the Lane"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Keeper Coat"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Copper Flask"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Old Rooftops"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Mosslight"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Rosewood"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Silver Thread"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

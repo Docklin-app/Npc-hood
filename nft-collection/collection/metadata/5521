@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #5521 — Lorekeeper",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/5521.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Lorekeeper"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Patchwork Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shadowed Face"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Patchwork Robe"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Old Book"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Moonlit Lane"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Old Gold"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Soft Sand"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Gold Stitch"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #6654 — Moonstruck",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/6654.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Moonstruck"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Deep Cowl"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Mask of the Lane"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Town Cloak"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Moon Pin"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Moonlit Lane"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Ember Alley"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Warm Umber"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Silver Thread"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

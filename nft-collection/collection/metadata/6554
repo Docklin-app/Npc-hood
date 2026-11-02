@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #6554 — Fortune-Keeper",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/6554.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Fortune-Keeper"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Ranger Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Quiet Eyes"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Town Cloak"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Lucky Charm"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Moonlit Lane"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Ember Alley"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Copper"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Silver Thread"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

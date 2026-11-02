@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #9491 — Lanternbearer",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/9491.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Lanternbearer"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Leaf-Cut Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shadowed Face"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Night Shift"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Pocket Lantern"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Town at Dusk"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Night Olive"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Moon-Pale"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Leaf Emblem"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

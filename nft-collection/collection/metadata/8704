@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #8704 — Pathfinder",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/8704.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Pathfinder"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Lantern Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Mask of the Lane"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Patchwork Robe"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Wayfinder Staff"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Old Rooftops"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Old Gold"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Moon-Pale"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Town Seal"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

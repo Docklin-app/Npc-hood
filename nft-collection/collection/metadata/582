@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #0582 — Courier",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/582.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Courier"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Wayfarer Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shadowed Face"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Scout Mantle"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Messenger Satchel"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Market After Hours"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Earthy Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Soft Sand"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Silver Thread"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

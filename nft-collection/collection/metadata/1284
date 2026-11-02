@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #1284 — Quiet Watcher",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/1284.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Quiet Watcher"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Ranger Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Mask of the Lane"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Night Shift"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "No Accessory"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Town at Dusk"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Rainy Borough"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Rosewood"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Silver Thread"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

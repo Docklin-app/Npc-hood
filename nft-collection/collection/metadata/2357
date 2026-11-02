@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #2357 — Keykeeper",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/2357.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Keykeeper"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Leaf-Cut Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Spectacles"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Patchwork Robe"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Town Key"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Mossy Gate"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Old Gold"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Soft Sand"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Leaf Emblem"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

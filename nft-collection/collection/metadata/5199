@@ -1,0 +1,48 @@
+{
+  "name": "NPC HOOD #5199 — Wayfinder",
+  "description": "A hooded little pixel character from the NPC HOOD universe. A quiet soul of the town at dusk, drawn in a classic limited-palette pixel-art style.",
+  "image": "ipfs://REPLACE_WITH_IMAGES_CID/5199.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Wayfinder"
+    },
+    {
+      "trait_type": "Hood",
+      "value": "Wayfarer Hood"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Amber Eyes"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Scout Mantle"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Folded Map"
+    },
+    {
+      "trait_type": "Setting",
+      "value": "Mossy Gate"
+    },
+    {
+      "trait_type": "Palette",
+      "value": "Mosslight"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Soft Sand"
+    },
+    {
+      "trait_type": "Mark",
+      "value": "Leaf Emblem"
+    },
+    {
+      "trait_type": "Art Style",
+      "value": "Pixel Art"
+    }
+  ]
+}

@@ -7,7 +7,8 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "export:frontend": "node scripts/export-frontend-artifact.cjs",
-    "deploy": "node scripts/preflight.cjs && hardhat run scripts/deploy.cjs --network npcHood"
+    "deploy": "node scripts/preflight.cjs && hardhat run scripts/deploy.cjs --network npcHood",
+    "update:base-uri": "hardhat run scripts/update-base-uri.cjs --network npcHood"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "3.0.8",

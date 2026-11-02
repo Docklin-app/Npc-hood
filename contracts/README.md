@@ -36,6 +36,21 @@ Setelah workflow selesai, ambil alamat kontrak dari log deployment. Verifikasi s
 
 NFT pertama memiliki token ID 1 dan metadata mengikuti URI prefix + token ID. Sebelum produksi, pastikan jalur metadata dan metadata token tersedia, lalu verifikasi kontrak di block explorer jaringan pilihan. Owner dapat mengganti URI prefix melalui `setCollectionBaseURI`; panggilan ini mengubah URI yang dibentuk untuk seluruh token.
 
+## Memperbarui Base URI setelah deploy
+
+Skrip `scripts/update-base-uri.cjs` mengganti URI prefix koleksi melalui Hardhat tanpa mengubah token ID. Siapkan `contracts/.env` dengan `NPC_HOOD_RPC_URL`, `NPC_HOOD_CHAIN_ID` (`56` mainnet atau `97` testnet), `NPC_HOOD_DEPLOYER_PRIVATE_KEY` milik **owner on-chain**, `NPC_HOOD_CONTRACT_ADDRESS`, dan `NPC_HOOD_BASE_URI`. URI baru boleh berupa `ipfs://<METADATA_CID>/` atau URL `https://` yang berakhir `/`; kontrak menambahkan token ID langsung ke prefix.
+
+Jalankan dari folder `contracts/`:
+
+```bash
+npm ci
+npm run update:base-uri
+```
+
+Perintah tersebut default-nya hanya melakukan dry-run: memeriksa chain ID, bytecode alamat kontrak, kecocokan signer dengan `owner()`, mensimulasikan pemanggilan, serta memperkirakan gas. Untuk mengirim transaksi di BSC Testnet setelah hasil dry-run benar, jalankan `NPC_HOOD_EXECUTE=1 npm run update:base-uri`. Untuk Mainnet, perlindungan tambahan wajib diberikan secara eksplisit dengan `NPC_HOOD_EXECUTE=1 NPC_HOOD_CONFIRM_MAINNET=1 npm run update:base-uri`; periksa ulang alamat kontrak dan CID sebelum menjalankannya. Skrip menolak jaringan selain chain ID 56/97 dan tidak menampilkan private key.
+
+Pemanggilan sukses mengubah URI untuk **semua token**, karena Base URI adalah pengaturan koleksi. Transaksi tetap memerlukan gas dan tidak dapat dibatalkan; jalankan dry-run dan uji di Testnet terlebih dahulu. Skrip ini hanya dikirim ke blockchain saat `NPC_HOOD_EXECUTE=1` ditetapkan.
+
 ## Aktifkan frontend
 
 1. Salin `.env.example` pada root menjadi `.env.local`.

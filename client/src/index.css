@@ -200,6 +200,59 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
 @media (max-width: 380px) {
   .brand-copy small { letter-spacing: .1em; }.wallet-button { padding: 0 7px; font-size: 7px; }.header-actions { gap: 5px; }.hero-copy h1 { font-size: 55px; }.hero-ctas { gap: 13px; }.button-primary { padding: 0 12px; }.mint-card { padding-left: 12px; padding-right: 12px; }.mint-mode { padding: 9px 7px; }.mint-mode > strong { font-size: 18px; }.site-footer > span { display: none; }
 }
+.agent-mint-section { position: relative; overflow: hidden; padding: 82px max(7vw, calc((100vw - 1160px) / 2)); background: #0b100d; color: var(--paper); border-top: 1px solid rgba(228,184,72,.42); }
+.agent-mint-section::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .11; background-image: linear-gradient(45deg, #8da66b 1px, transparent 1px), linear-gradient(-45deg, #8da66b 1px, transparent 1px); background-size: 28px 28px; mask-image: linear-gradient(90deg, transparent, #000 45%, #000); }
+.agent-mint-inner { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; }
+.agent-mint-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; padding-bottom: 24px; }
+.agent-section-kicker { display: block; color: #8db59a; font: 8px var(--mono); letter-spacing: .16em; }
+.agent-mint-header h2 { margin: 16px 0 12px; color: var(--paper); font: 700 clamp(28px, 4vw, 50px)/1.03 var(--mono); letter-spacing: -.06em; }
+.agent-mint-header h2 em { color: var(--gold); font-style: normal; }
+.agent-mint-header p { max-width: 620px; margin: 0; color: #b4b9ad; font-size: 13px; line-height: 1.75; }
+.agent-safety-badge { display: inline-flex; flex: none; align-items: center; gap: 8px; margin-top: 5px; padding: 10px 11px; border: 1px solid rgba(228,184,72,.55); color: var(--gold-bright); font: 8px var(--mono); letter-spacing: .06em; }
+.agent-wallet-panel { padding: 16px; border: 1px solid rgba(244,241,232,.24); background: rgba(244,241,232,.035); }
+.agent-wallet-label { display: block; margin-bottom: 9px; color: #9bc0a3; font: 8px var(--mono); letter-spacing: .12em; }
+.agent-wallet-row { display: flex; align-items: stretch; gap: 9px; }
+.agent-wallet-input { width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid rgba(228,184,72,.65); outline: none; background: #090d0b; color: var(--paper); font: 11px var(--mono); }
+.agent-wallet-input::placeholder { color: #7f8579; }
+.agent-wallet-input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.agent-wallet-input.invalid { border-color: #d78272; }
+.agent-use-wallet { display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 12px; border: 1px solid rgba(244,241,232,.34); background: transparent; color: var(--paper); font: 8px var(--mono); letter-spacing: .04em; }
+.agent-use-wallet:hover { border-color: var(--gold); color: var(--gold-bright); }
+.agent-wallet-hint { margin: 9px 0 0; color: #9ca294; font: 8px/1.6 var(--mono); }
+.agent-config-alert { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; padding: 11px 12px; border: 1px solid rgba(228,184,72,.42); background: rgba(228,184,72,.08); color: #d8d2bd; }
+.agent-config-alert > span { color: var(--gold); font: 700 14px var(--mono); }
+.agent-config-alert p { margin: 0; font: 9px/1.65 var(--mono); }
+.agent-config-alert strong { color: var(--gold-bright); }
+.agent-prompt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; margin-top: 16px; }
+.agent-prompt-card { min-width: 0; display: flex; flex-direction: column; border: 1px solid rgba(228,184,72,.55); background: #151a16; box-shadow: 4px 4px 0 rgba(0,0,0,.4); }
+.agent-prompt-card-header { min-height: 67px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid rgba(244,241,232,.2); }
+.agent-card-kicker { color: #8db59a; font: 7px var(--mono); letter-spacing: .12em; }
+.agent-prompt-card-header h3 { margin: 5px 0 0; color: var(--paper); font: 600 14px var(--mono); }
+.agent-card-total { flex: none; color: var(--gold-bright); font: 8px var(--mono); }
+.agent-prompt-text { width: 100%; min-height: 235px; max-height: 275px; overflow: auto; margin: 0; padding: 14px; border: 0; background: #0c100e; color: #d4d7cc; font: 9px/1.7 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.agent-copy-button { min-height: 43px; display: inline-flex; justify-content: center; align-items: center; gap: 8px; margin: 11px; border: 1px solid var(--gold); background: var(--gold); color: var(--pine-deep); font: 9px var(--mono); letter-spacing: .06em; }
+.agent-copy-button:hover:not(:disabled) { background: var(--gold-bright); }
+.agent-copy-button:disabled { cursor: not-allowed; opacity: .48; }
+.agent-notice { display: flex; align-items: flex-start; gap: 9px; margin-top: 18px; color: #b7bdaf; }
+.agent-notice svg { flex: none; margin-top: 2px; color: var(--gold); }
+.agent-notice p { margin: 0; font: 8px/1.75 var(--mono); }
+.agent-copy-status { margin: 11px 0 0; color: var(--gold-bright); font: 9px/1.6 var(--mono); }
+@media (max-width: 980px) { .agent-mint-section { padding: 68px 6vw 76px; } }
+@media (max-width: 720px) {
+  .agent-mint-section { padding: 56px 19px 63px; }
+  .agent-mint-header { display: grid; grid-template-columns: 1fr; gap: 17px; }
+  .agent-mint-header h2 { font-size: clamp(27px, 8.8vw, 40px); }
+  .agent-mint-header p { font-size: 11px; }
+  .agent-safety-badge { justify-self: start; }
+  .agent-wallet-panel { padding: 13px; }
+  .agent-wallet-row { flex-direction: column; }
+  .agent-use-wallet { min-height: 38px; }
+  .agent-prompt-grid { grid-template-columns: 1fr; gap: 13px; }
+  .agent-prompt-card-header h3 { font-size: 13px; }
+  .agent-prompt-text { min-height: 190px; max-height: 225px; padding: 12px; font-size: 8px; }
+  .agent-notice { align-items: flex-start; }
+}
+@media (max-width: 380px) { .agent-mint-section { padding-left: 15px; padding-right: 15px; }.agent-prompt-card-header { padding: 11px; }.agent-card-total { font-size: 7px; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

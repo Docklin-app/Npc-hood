@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { NPC_HOOD_ABI } from "@/lib/npcHoodAbi";
+import AgentMintPromptBuilder from "@/components/AgentMintPromptBuilder";
 
 type InjectedWallet = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
@@ -277,6 +278,7 @@ export default function Home() {
         <nav className={mobileNavOpen ? "main-nav is-open" : "main-nav"} aria-label="Navigasi utama">
           <a href="#collection" onClick={() => setMobileNavOpen(false)}>Koleksi</a>
           <a href="#mint" onClick={() => setMobileNavOpen(false)}>Mint</a>
+          <a href="#agent-mint" onClick={() => setMobileNavOpen(false)}>AI Agent</a>
           <a href="#lore" onClick={() => setMobileNavOpen(false)}>Cerita</a>
           <a href="#faq" onClick={() => setMobileNavOpen(false)}>FAQ</a>
         </nav>
@@ -372,6 +374,16 @@ export default function Home() {
           </div>
           <div className="mint-side-label">MINT DIRECTLY<br />FROM THE SOURCE <ArrowDown size={14} /></div>
         </section>
+
+        <AgentMintPromptBuilder
+          account={account}
+          chainId={CHAIN_ID}
+          chainName={CHAIN_NAME}
+          contractAddress={CONTRACT_ADDRESS}
+          currency={CURRENCY}
+          configured={hasConfig}
+          quantity={quantity}
+        />
 
         <section className="steps-section" aria-label="Cara mint">
           <div className="steps-heading"><span className="section-kicker">THREE SMALL STEPS</span><span>THE REST IS YOUR STORY.</span></div>

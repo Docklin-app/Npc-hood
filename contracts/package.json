@@ -1,0 +1,17 @@
+{
+  "name": "npc-hood-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NPC HOOD ERC-721 smart contract deployment package",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "node scripts/preflight.cjs && hardhat run scripts/deploy.cjs --network npcHood"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "3.0.8",
+    "@openzeppelin/contracts": "5.4.0",
+    "dotenv": "16.4.5",
+    "hardhat": "2.22.17"
+  }
+}

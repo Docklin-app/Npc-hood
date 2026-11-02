@@ -15,6 +15,7 @@ contract NpcHood is ERC721, Ownable, ReentrancyGuard {
     uint256 public constant PAID_MINT_PRICE = 0.0003 ether;
 
     uint256 public totalMinted;
+    bool public mintOpen;
     string private _collectionBaseURI;
 
     error InvalidQuantity();
@@ -24,10 +25,12 @@ contract NpcHood is ERC721, Ownable, ReentrancyGuard {
     error NothingToWithdraw();
     error TransferFailed();
     error DirectPaymentDisabled();
+    error MintNotOpen();
 
     event NpcHoodMinted(address indexed minter, uint256 quantity, bool paid, uint256 amountPaid);
     event ProceedsWithdrawn(address indexed recipient, uint256 amount);
     event CollectionBaseURIChanged(string newBaseURI);
+    event MintOpenStatusChanged(bool isOpen);
 
     constructor(string memory initialBaseURI)
         ERC721("NPC HOOD", "HOOD")
@@ -44,6 +47,12 @@ contract NpcHood is ERC721, Ownable, ReentrancyGuard {
     /// @notice Mint at the paid route's price of 0.0003 native currency per NFT.
     function paidMint(uint256 quantity) external payable nonReentrant {
         _mintFor(msg.sender, quantity, PAID_MINT_PRICE, true);
+    }
+
+    /// @notice Open or pause public minting. Mint starts closed after deployment.
+    function setMintOpen(bool isOpen) external onlyOwner {
+        mintOpen = isOpen;
+        emit MintOpenStatusChanged(isOpen);
     }
 
     /// @notice Withdraw the full collected balance to the current contract owner.
@@ -65,6 +74,7 @@ contract NpcHood is ERC721, Ownable, ReentrancyGuard {
     }
 
     function _mintFor(address recipient, uint256 quantity, uint256 unitPrice, bool paid) private {
+        if (!mintOpen) revert MintNotOpen();
         if (quantity == 0) revert InvalidQuantity();
         if (quantity > MAX_PER_TX) revert TransactionLimitExceeded(quantity, MAX_PER_TX);
         uint256 remaining = MAX_SUPPLY - totalMinted;

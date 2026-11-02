@@ -2,11 +2,12 @@ const assert = require("node:assert/strict");
 const { ethers } = require("hardhat");
 
 describe("NpcHood", function () {
-  async function deployCollection() {
+  async function deployCollection({ open = true } = {}) {
     const [owner, collector] = await ethers.getSigners();
     const Factory = await ethers.getContractFactory("NpcHood");
     const collection = await Factory.deploy("https://metadata.example/npc/");
     await collection.waitForDeployment();
+    if (open) await collection.setMintOpen(true);
     return { collection, owner, collector };
   }
 
@@ -29,6 +30,25 @@ describe("NpcHood", function () {
     assert.equal(await collection.ownerOf(1), collector.address);
     assert.equal(await collection.ownerOf(2), collector.address);
     assert.equal(await ethers.provider.getBalance(await collection.getAddress()), payment);
+  });
+
+  it("starts closed and lets only the owner control mint availability", async function () {
+    const { collection, owner, collector } = await deployCollection({ open: false });
+    assert.equal(await collection.mintOpen(), false);
+    await expectRevert(
+      collection.connect(collector).freeMint(1, { value: ethers.parseEther("0.0001") }),
+      "MintNotOpen",
+    );
+    await expectRevert(collection.connect(collector).setMintOpen(true), "OwnableUnauthorizedAccount");
+    await collection.connect(owner).setMintOpen(true);
+    assert.equal(await collection.mintOpen(), true);
+    await collection.connect(collector).freeMint(1, { value: ethers.parseEther("0.0001") });
+    await collection.connect(owner).setMintOpen(false);
+    assert.equal(await collection.mintOpen(), false);
+    await expectRevert(
+      collection.connect(collector).freeMint(1, { value: ethers.parseEther("0.0001") }),
+      "MintNotOpen",
+    );
   });
 
   it("mints paid items only at the exact per-item price", async function () {

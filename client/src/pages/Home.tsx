@@ -80,6 +80,7 @@ export default function Home() {
   const [walletChain, setWalletChain] = useState<number | null>(null);
   const [minted, setMinted] = useState<number | null>(null);
   const [contractVerified, setContractVerified] = useState(false);
+  const [mintOpen, setMintOpen] = useState(false);
   const [contractWarning, setContractWarning] = useState("");
   const [mode, setMode] = useState<MintMode>("free");
   const [quantity, setQuantity] = useState(1);
@@ -101,11 +102,12 @@ export default function Home() {
       const network = await provider.getNetwork();
       if (Number(network.chainId) !== CHAIN_ID) {
         setContractVerified(false);
+        setMintOpen(false);
         return;
       }
       const contract = new Contract(CONTRACT_ADDRESS, NPC_HOOD_ABI, provider);
-      const [total, cap, perTx, freeFee, paidPrice] = await Promise.all([
-        contract.totalMinted(), contract.MAX_SUPPLY(), contract.MAX_PER_TX(), contract.FREE_MINT_FEE(), contract.PAID_MINT_PRICE(),
+      const [total, cap, perTx, freeFee, paidPrice, onChainMintOpen] = await Promise.all([
+        contract.totalMinted(), contract.MAX_SUPPLY(), contract.MAX_PER_TX(), contract.FREE_MINT_FEE(), contract.PAID_MINT_PRICE(), contract.mintOpen(),
       ]);
       const onChainCap = Number(cap);
       const onChainPerTx = Number(perTx);
@@ -113,13 +115,16 @@ export default function Home() {
       if (Number.isSafeInteger(onChainCap) && Number.isSafeInteger(onChainPerTx) && Number.isSafeInteger(totalCount) && onChainCap === TOTAL_SUPPLY && onChainPerTx === MAX_PER_TX && freeFee === FREE_FEE && paidPrice === PAID_PRICE) {
         setMinted(totalCount);
         setContractVerified(true);
+        setMintOpen(Boolean(onChainMintOpen));
         setContractWarning("");
       } else {
         setContractVerified(false);
+        setMintOpen(false);
         setContractWarning("Kontrak tidak cocok dengan supply, batas transaksi, atau harga NPC HOOD.");
       }
     } catch (error) {
       setContractVerified(false);
+      setMintOpen(false);
       setContractWarning("Kontrak belum dapat diverifikasi di jaringan ini. Periksa chain ID dan alamat kontrak.");
       console.warn("Could not read NPC HOOD contract state", error);
     }
@@ -221,6 +226,11 @@ export default function Home() {
       setNotice(contractWarning || "Kontrak harus terverifikasi sebelum transaksi dapat dikirim.");
       return;
     }
+    if (!mintOpen) {
+      setTxState("error");
+      setNotice("Mint masih ditutup. Tunggu sampai owner kontrak membukanya.");
+      return;
+    }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PER_TX || (remaining !== null && quantity > remaining)) {
       setNotice("Jumlah mint tidak valid atau melebihi sisa supply.");
       setTxState("error");
@@ -265,7 +275,7 @@ export default function Home() {
   };
 
   const progress = minted === null ? 0 : Math.min(100, (minted / TOTAL_SUPPLY) * 100);
-  const mintLabel = !hasConfig ? "MINT BELUM AKTIF" : !account ? "HUBUNGKAN WALLET" : !onTargetNetwork ? "GANTI JARINGAN" : !contractVerified ? "VERIFIKASI KONTRAK" : txState === "signature" ? "MENUNGGU SIGNATURE" : txState === "pending" ? "TRANSAKSI PENDING" : "MINT NPC HOOD";
+  const mintLabel = !hasConfig ? "MINT BELUM AKTIF" : !account ? "HUBUNGKAN WALLET" : !onTargetNetwork ? "GANTI JARINGAN" : !contractVerified ? "VERIFIKASI KONTRAK" : !mintOpen ? "MINT BELUM DIBUKA OWNER" : txState === "signature" ? "MENUNGGU SIGNATURE" : txState === "pending" ? "TRANSAKSI PENDING" : "MINT NPC HOOD";
 
   return (
     <div className="site-shell" id="top">
@@ -362,12 +372,13 @@ export default function Home() {
               <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
               <div className="progress-legend"><span>{remaining === null ? "On-chain count appears after connection" : `${remaining.toLocaleString("en-US")} REMAINING`}</span><Layers3 size={14} /></div>
             </div>
-            <button className={hasConfig ? "mint-submit" : "mint-submit disabled"} onClick={submitMint} disabled={!hasConfig || (Boolean(account) && (!onTargetNetwork || !contractVerified)) || txState === "signature" || txState === "pending"}>
+            <button className={hasConfig && mintOpen ? "mint-submit" : "mint-submit disabled"} onClick={submitMint} disabled={!hasConfig || !account || !onTargetNetwork || !contractVerified || !mintOpen || txState === "signature" || txState === "pending"}>
               {txState === "signature" || txState === "pending" ? <span className="button-spinner" /> : <span className="mint-submit-mark">✳</span>}
               {mintLabel}<ArrowUpRight size={17} />
             </button>
             {!hasConfig && <div className="config-alert"><span className="config-alert-dot" /><span><strong>CONTRACT NOT CONFIGURED</strong> — isi chain ID dan alamat kontrak sebelum mint live.</span></div>}
             {hasConfig && contractWarning && <div className="config-alert"><span className="config-alert-dot" /><span><strong>CONTRACT CHECK</strong> — {contractWarning}</span></div>}
+            {hasConfig && contractVerified && !mintOpen && <div className="config-alert"><span className="config-alert-dot" /><span><strong>MINT DITUTUP</strong> — menunggu owner membuka mint dari kontrak.</span></div>}
             {account && hasConfig && !onTargetNetwork && <button className="network-alert" onClick={changeNetwork}>Wallet berada di jaringan lain. Beralih ke {CHAIN_NAME}? <ChevronDown size={14} /></button>}
             {notice && <div className={`tx-message ${txState}`} role="status" aria-live="polite">{txState === "success" && <Check size={15} />}{notice}{txHash && <a href={EXPLORER_URL ? `${EXPLORER_URL}/tx/${txHash}` : undefined} target="_blank" rel="noreferrer" className={EXPLORER_URL ? "tx-link" : "tx-hash"}>{EXPLORER_URL ? <> VIEW TX <ExternalLink size={12} /></> : shortAddress(txHash)}</a>}</div>}
             <p className="mint-disclaimer"><ShieldCheck size={12} /> Review network, amount, and gas in your wallet. Never share your recovery phrase.</p>
@@ -382,6 +393,7 @@ export default function Home() {
           contractAddress={CONTRACT_ADDRESS}
           currency={CURRENCY}
           configured={hasConfig}
+          mintOpen={mintOpen}
           quantity={quantity}
         />
 

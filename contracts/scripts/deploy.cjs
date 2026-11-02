@@ -20,9 +20,14 @@ async function main() {
   const NpcHood = await hre.ethers.getContractFactory("NpcHood");
   const collection = await NpcHood.deploy(baseURI);
   await collection.waitForDeployment();
-  console.log("NPC HOOD contract:", await collection.getAddress());
+  const contractAddress = await collection.getAddress();
+  const mintOpen = await collection.mintOpen();
+  if (mintOpen) throw new Error("Safety check failed: mint must remain closed after deployment.");
+  console.log("NPC HOOD contract:", contractAddress);
   console.log("Owner / proceeds recipient:", await collection.owner());
   console.log("Configured chain ID:", process.env.NPC_HOOD_CHAIN_ID);
+  console.log("Mint status after deployment: CLOSED; owner must call setMintOpen(true) manually.");
+  if (configuredChainId === 56n) console.log("BscScan:", `https://bscscan.com/address/${contractAddress}`);
 }
 
 main().catch((error) => {

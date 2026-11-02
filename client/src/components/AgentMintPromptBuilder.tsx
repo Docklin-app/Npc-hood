@@ -11,6 +11,7 @@ type AgentMintPromptBuilderProps = {
   contractAddress: string;
   currency: string;
   configured: boolean;
+  mintOpen: boolean;
   quantity: number;
 };
 
@@ -56,9 +57,9 @@ function makePrompt({
     `NPC HOOD contract: ${contractAddress}. Do not use another contract, token, treasury, or recipient address.`,
     `Signing wallet: ${walletAddress}. The contract mints to msg.sender; only proceed if the active wallet is exactly this address.`,
     `Mint call: ${method}(${quantity}) with msg.value exactly ${totalValueText} ${safeLabel(currency)} (${unitPriceText} ${safeLabel(currency)} per NFT × ${quantity}). Network gas is separate.`,
-    "Before preparing the transaction, read the contract on the specified chain and verify MAX_SUPPLY() is 10000, MAX_PER_TX() is 20, FREE_MINT_FEE() is 0.0001 native coin, PAID_MINT_PRICE() is 0.0003 native coin, and totalMinted() + quantity does not exceed MAX_SUPPLY(). Stop if any value, network, or contract does not match.",
+    "Before preparing the transaction, read the contract on the specified chain and verify mintOpen() is true, MAX_SUPPLY() is 10000, MAX_PER_TX() is 20, FREE_MINT_FEE() is 0.0001 native coin, PAID_MINT_PRICE() is 0.0003 native coin, and totalMinted() + quantity does not exceed MAX_SUPPLY(). Stop if mintOpen() is false or any value, network, or contract does not match.",
     "Show me the complete unsigned transaction details first: chain and chain ID, contract, method, quantity, value, signing wallet, estimated gas, and total cost. Wait for my explicit approval in the wallet before signing or sending exactly this mint call. Do not submit, broadcast, or approve anything else.",
-    "Never ask for, display, or transmit a seed phrase or private key. Do not call owner-only functions such as withdraw() or setCollectionBaseURI(). If you cannot use the specified wallet or verify the contract, stop and explain why.",
+    "Never ask for, display, or transmit a seed phrase or private key. Do not call owner-only functions such as withdraw(), setCollectionBaseURI(), or setMintOpen(). If you cannot use the specified wallet or verify the contract, stop and explain why.",
   ].join("\n\n");
 }
 
@@ -69,6 +70,7 @@ export default function AgentMintPromptBuilder({
   contractAddress,
   currency,
   configured,
+  mintOpen,
   quantity,
 }: AgentMintPromptBuilderProps) {
   const [walletAddress, setWalletAddress] = useState("");
@@ -89,9 +91,10 @@ export default function AgentMintPromptBuilder({
     currency.trim() !== "" &&
     currency !== "NATIVE";
   const canCopy =
-    safeConfiguration && validAddress && quantity >= 1 && quantity <= 20;
+    safeConfiguration && mintOpen && validAddress && quantity >= 1 && quantity <= 20;
 
   const promptFor = (mode: MintMode) => {
+    if (!mintOpen) return "Mint masih ditutup oleh owner; prompt belum tersedia.";
     if (!canCopy || chainId === null)
       return "Prompt tersedia setelah alamat wallet, jaringan, dan kontrak terkonfigurasi dengan benar.";
     return makePrompt({
@@ -108,7 +111,9 @@ export default function AgentMintPromptBuilder({
   const copyPrompt = async (mode: MintMode) => {
     if (!canCopy) {
       setStatus(
-        "Isi alamat wallet 0x yang valid dan pastikan konfigurasi chain serta kontrak sudah tersedia."
+        mintOpen
+          ? "Isi alamat wallet 0x yang valid dan pastikan konfigurasi chain serta kontrak sudah tersedia."
+          : "Mint masih ditutup oleh owner. Prompt akan tersedia setelah owner membuka mint."
       );
       return;
     }

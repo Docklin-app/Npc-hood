@@ -1,0 +1,66 @@
+name: Deploy NPC HOOD to BNB Mainnet
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type DEPLOY NPC HOOD TO BNB MAINNET to continue
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npc-hood-bnb-mainnet-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: bsc-mainnet
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - name: Check out main branch
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+
+      - name: Confirm manual mainnet deployment
+        env:
+          DEPLOY_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [ "$DEPLOY_CONFIRMATION" != "DEPLOY NPC HOOD TO BNB MAINNET" ]; then
+            echo "Confirmation text did not match. Nothing was deployed."
+            exit 1
+          fi
+
+      - name: Install locked contract dependencies
+        run: npm ci
+
+      - name: Block deployment on high or critical dependency advisories
+        run: npm audit --audit-level=high
+
+      - name: Compile and run contract tests
+        run: |
+          npm run compile
+          npm test
+
+      - name: Deploy with mint closed
+        env:
+          NPC_HOOD_RPC_URL: ${{ secrets.NPC_HOOD_RPC_URL }}
+          NPC_HOOD_CHAIN_ID: "56"
+          NPC_HOOD_DEPLOYER_PRIVATE_KEY: ${{ secrets.NPC_HOOD_DEPLOYER_PRIVATE_KEY }}
+          NPC_HOOD_BASE_URI: ${{ secrets.NPC_HOOD_BASE_URI }}
+        run: npm run deploy

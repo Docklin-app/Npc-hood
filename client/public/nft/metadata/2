@@ -1,0 +1,13 @@
+{
+  "name": "NPC HOOD — Night Watch",
+  "description": "A quiet watcher of the NPC HOOD town. Wrapped in an olive hood and carrying a small lantern, Night Watch keeps an eye on the lanes after dusk.",
+  "image": "https://npcshood.xyz/nft/images/night-watch.png",
+  "external_url": "https://npcshood.xyz/",
+  "attributes": [
+    {"trait_type": "Character", "value": "Night Watch"},
+    {"trait_type": "Hood", "value": "Dark Olive"},
+    {"trait_type": "Accessory", "value": "Lantern"},
+    {"trait_type": "Setting", "value": "Town Lane at Dusk"},
+    {"trait_type": "Art Style", "value": "Pixel Art"}
+  ]
+}

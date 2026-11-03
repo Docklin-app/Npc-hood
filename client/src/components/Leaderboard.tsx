@@ -81,7 +81,7 @@ export default function Leaderboard({ contractAddress, explorerUrl, configured, 
         </div>
       )}
       {rows && total === 0 && (
-        <p className="hood-summary">No minters yet — this board fills in the moment minting opens and the first hoods are claimed.</p>
+        <p className="hood-summary">Mint is open and no one has claimed a hood yet — the first minter takes the crown.</p>
       )}
       {rows && rows.length > 0 && (
         <ol className="board-list">

@@ -146,7 +146,7 @@ export default function RecentMints({
           {total === null
             ? "Reading the contract…"
             : total === 0
-              ? "0 of 10,000 minted so far. The latest mints will appear here as soon as minting opens."
+              ? "Mint is open — 0 of 10,000 minted so far. The first mints will appear here within a minute."
               : `${total.toLocaleString("en-US")} of 10,000 minted so far. The latest ${tokens.length} are shown below, read live from the contract.`}
         </p>
       </div>

@@ -136,9 +136,13 @@ export default function TownAwakening({ contractAddress, configured, refreshSign
           {[
             [40, 30], [120, 58], [210, 24], [300, 46], [392, 28], [470, 60], [560, 22], [648, 44], [730, 26], [800, 56], [66, 84], [770, 92],
           ].map(([sx, sy], i) => (
-            <rect key={i} x={sx} y={sy} width="3" height="3" fill="rgba(244,241,232,0.5)" />
+            <rect key={i} x={sx} y={sy} width="3" height="3" fill="rgba(244,241,232,0.5)" className="town-star" style={{ animationDelay: `${(i % 7) * 0.9}s` }} />
           ))}
-          <circle cx="788" cy="42" r="17" fill="#f0ce74" opacity="0.9" />
+          <g className="shooting-star" aria-hidden="true">
+            <rect x="0" y="0" width="26" height="3" fill="#f4f1e8" />
+            <rect x="26" y="0" width="9" height="3" fill="#e4b848" />
+          </g>
+          <circle cx="788" cy="42" r="17" fill="#f0ce74" opacity="0.9" className="town-moon" />
           <circle cx="781" cy="37" r="15" fill="#0c271b" opacity="0.25" />
           {HOUSES.map((house) => {
             const top = GROUND_Y - house.h;
@@ -157,7 +161,7 @@ export default function TownAwakening({ contractAddress, configured, refreshSign
               windowIndex += 1;
               const lit = windowIndex < litWindows;
               return (
-                <g key={`${win.x}-${win.y}`}>
+                <g key={`${win.x}-${win.y}`} className={lit ? "win-lit" : undefined} style={lit ? { animationDelay: `${(windowIndex % 9) * 0.7}s` } : undefined}>
                   {lit && <rect x={win.x - 3} y={win.y - 3} width="18" height="22" fill="rgba(228,184,72,0.22)" />}
                   <rect x={win.x} y={win.y} width="12" height="16" fill={lit ? "#e4b848" : "rgba(244,241,232,0.13)"} />
                 </g>
@@ -169,11 +173,21 @@ export default function TownAwakening({ contractAddress, configured, refreshSign
             return (
               <g key={lx}>
                 <rect x={lx} y={GROUND_Y - 64} width="3" height="64" fill="#20503a" />
-                {lit && <circle cx={lx + 1.5} cy={GROUND_Y - 70} r="11" fill="rgba(228,184,72,0.25)" />}
+                {lit && <circle cx={lx + 1.5} cy={GROUND_Y - 70} r="11" fill="rgba(228,184,72,0.25)" className="lantern-glow" />}
                 <circle cx={lx + 1.5} cy={GROUND_Y - 70} r="5" fill={lit ? "#f0ce74" : "rgba(244,241,232,0.2)"} />
               </g>
             );
           })}
+          <g className="walker" aria-hidden="true">
+            <g className="walker-bob">
+              <rect x="2" y={GROUND_Y - 6} width="4" height="6" fill="#0c271b" />
+              <rect x="9" y={GROUND_Y - 6} width="4" height="6" fill="#0c271b" />
+              <rect x="0" y={GROUND_Y - 20} width="15" height="15" fill="#20503a" />
+              <rect x="2" y={GROUND_Y - 27} width="11" height="8" fill="#20503a" />
+              <rect x="4" y={GROUND_Y - 24} width="7" height="3" fill="#e8c39e" />
+              <rect x="17" y={GROUND_Y - 16} width="4" height="5" fill="#e4b848" className="lantern-glow" />
+            </g>
+          </g>
           <rect x="0" y={GROUND_Y} width="840" height="38" fill="#081c12" />
           <rect x="0" y={GROUND_Y} width="840" height="2" fill="rgba(228,184,72,0.35)" />
         </svg>

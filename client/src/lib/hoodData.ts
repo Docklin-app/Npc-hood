@@ -44,6 +44,16 @@ export async function readTotalMinted(contractAddress: string): Promise<number |
   }
 }
 
+export async function readTokenOwner(contractAddress: string, id: number): Promise<string | null> {
+  const contract = await connectReadContract(contractAddress);
+  if (!contract) return null;
+  try {
+    return String(await contract.ownerOf(id)).toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
 export type ScanResult = {
   total: number;
   owners: string[];

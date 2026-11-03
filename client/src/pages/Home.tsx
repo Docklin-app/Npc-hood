@@ -1,5 +1,5 @@
 import { BrowserProvider, Contract, formatEther, parseEther } from "ethers";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowRight,
@@ -22,6 +22,8 @@ import ShareMint from "@/components/ShareMint";
 import MyNpcs from "@/components/MyNpcs";
 import Leaderboard from "@/components/Leaderboard";
 import RaceToChapter from "@/components/RaceToChapter";
+import CollectionExplorer from "@/components/CollectionExplorer";
+import { fetchTokenMeta, padTokenId, readTokenOwner, readTotalMinted } from "@/lib/hoodData";
 import TownAwakening from "@/components/TownAwakening";
 
 type InjectedWallet = {
@@ -94,6 +96,10 @@ export default function Home() {
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [lastMintIds, setLastMintIds] = useState<number[]>([]);
   const [connecting, setConnecting] = useState(false);
+  const [liveToast, setLiveToast] = useState<{ id: number; owner: string; label: string; image: string; extra: number } | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+  const prevTotalRef = useRef<number | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
 
   const remaining = minted === null ? null : Math.max(0, TOTAL_SUPPLY - minted);
   const perItem = mode === "free" ? FREE_FEE : PAID_PRICE;
@@ -169,6 +175,43 @@ export default function Home() {
       injected.removeListener?.("chainChanged", handleChain);
     };
   }, [refreshSupply]);
+
+  // Live mint watcher: polls the public mint counter so a mint landing
+  // anywhere in the world pops a toast here and refreshes the boards,
+  // even for visitors without a wallet connected.
+  useEffect(() => {
+    if (!hasConfig) return;
+    let cancelled = false;
+    const tick = async () => {
+      const total = await readTotalMinted(CONTRACT_ADDRESS);
+      if (cancelled || total === null) return;
+      const prev = prevTotalRef.current;
+      prevTotalRef.current = total;
+      setMinted((current) => (current === total ? current : total));
+      if (prev !== null && total > prev) {
+        const [owner, meta] = await Promise.all([
+          readTokenOwner(CONTRACT_ADDRESS, total),
+          fetchTokenMeta(CONTRACT_ADDRESS, total),
+        ]);
+        if (cancelled) return;
+        setLiveToast({
+          id: total,
+          owner: owner ?? "",
+          label: meta.character || meta.name,
+          image: meta.image,
+          extra: total - prev - 1,
+        });
+        if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = window.setTimeout(() => setLiveToast(null), 9000);
+      }
+    };
+    void tick();
+    const timer = window.setInterval(() => void tick(), 30000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const connectWallet = async () => {
     setNotice("");
@@ -297,6 +340,8 @@ export default function Home() {
       }
       if (mintedIds.length > 0) setLastMintIds(mintedIds);
       setTxState("success");
+      setCelebrating(true);
+      window.setTimeout(() => setCelebrating(false), 2400);
       setNotice("Mint successful. Thank you for being part of NPC HOOD.");
       await refreshSupply(provider);
     } catch (error) {
@@ -341,6 +386,40 @@ export default function Home() {
         <div className="wallet-banner" role="status" aria-live="polite">{notice}</div>
       )}
 
+      {celebrating && (
+        <div className="pixel-burst" aria-hidden="true">
+          {Array.from({ length: 42 }).map((_, i) => (
+            <span
+              key={i}
+              style={{
+                left: `${(i * 37) % 100}%`,
+                animationDelay: `${(i % 14) * 0.11}s`,
+                background: ["#e4b848", "#f0ce74", "#7fb069", "#f4f1e8"][i % 4],
+                width: 5 + (i % 3) * 3,
+                height: 5 + (i % 3) * 3,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {liveToast && (
+        <div className="mint-toast" role="status">
+          <img src={liveToast.image} alt="" />
+          <div>
+            <strong>JUST MINTED · #{padTokenId(liveToast.id)}</strong>
+            <span>
+              {liveToast.label}
+              {liveToast.owner ? ` — by ${shortAddress(liveToast.owner)}` : ""}
+              {liveToast.extra > 0 ? ` · +${liveToast.extra} more` : ""}
+            </span>
+          </div>
+          <button onClick={() => setLiveToast(null)} aria-label="Dismiss notification">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       <main>
         <section className="hero-section" aria-labelledby="hero-title">
           <div className="hero-copy">
@@ -358,6 +437,12 @@ export default function Home() {
           <div className="hero-art-wrap">
             <div className="hero-art-frame">
               <img src={HERO_IMAGE} alt="Pixel-art character in a green hood and green hat, in a town at dusk" className="hero-art" />
+              <span className="sparkle" style={{ top: "12%", left: "18%", animationDelay: "0.2s" }} />
+              <span className="sparkle" style={{ top: "22%", left: "74%", animationDelay: "1.1s" }} />
+              <span className="sparkle" style={{ top: "8%", left: "52%", animationDelay: "1.8s" }} />
+              <span className="sparkle" style={{ top: "38%", left: "88%", animationDelay: "0.6s" }} />
+              <span className="sparkle" style={{ top: "16%", left: "36%", animationDelay: "2.3s" }} />
+              <span className="sparkle" style={{ top: "30%", left: "8%", animationDelay: "1.5s" }} />
               <div className="art-corner art-corner-tl" /><div className="art-corner art-corner-br" />
             </div>
           </div>
@@ -478,6 +563,8 @@ export default function Home() {
           configured={hasConfig}
           refreshSignal={minted}
         />
+
+        <CollectionExplorer contractAddress={CONTRACT_ADDRESS} configured={hasConfig} />
 
         <section className="lore-section" id="lore">
           <div className="lore-ornament"><PixelMark /><span>THE HOOD CHRONICLES</span></div>

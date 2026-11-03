@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Crown } from "lucide-react";
-import { scanMintRoutes, scanOwners, shortAddress } from "@/lib/hoodData";
+import { fetchTokenMeta, scanMintRoutes, scanOwners, shortAddress } from "@/lib/hoodData";
 
 type LeaderboardProps = {
   contractAddress: string;
@@ -14,8 +14,14 @@ type Row = {
   count: number;
 };
 
+type PodiumEntry = Row & {
+  image: string;
+  character: string;
+};
+
 export default function Leaderboard({ contractAddress, explorerUrl, configured, refreshSignal }: LeaderboardProps) {
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [podium, setPodium] = useState<PodiumEntry[]>([]);
   const [paidWallets, setPaidWallets] = useState<string[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -37,9 +43,20 @@ export default function Leaderboard({ contractAddress, explorerUrl, configured, 
       }
       const sorted = [...counts.entries()]
         .map(([address, count]) => ({ address, count }))
-        .sort((a, b) => b.count - a.count || a.address.localeCompare(b.address))
-        .slice(0, 10);
-      setRows(sorted);
+        .sort((a, b) => b.count - a.count || a.address.localeCompare(b.address));
+      setRows(sorted.slice(0, 10));
+      const topThree = sorted.slice(0, 3);
+      const entries: PodiumEntry[] = [];
+      for (const entry of topThree) {
+        const firstId = scan.owners.indexOf(entry.address) + 1;
+        const meta = firstId > 0 ? await fetchTokenMeta(contractAddress, firstId) : null;
+        entries.push({
+          ...entry,
+          image: meta?.image ?? "",
+          character: meta?.character ?? "",
+        });
+      }
+      setPodium(entries);
     } catch (err) {
       setError(err instanceof Error ? err.message : "The leaderboard scan failed.");
     } finally {
@@ -103,27 +120,60 @@ export default function Leaderboard({ contractAddress, explorerUrl, configured, 
             The crown falls at {topCount + 1} NPC{topCount + 1 > 1 ? "s" : ""} — any single wallet holding {topCount + 1}{" "}
             takes the board.
           </p>
+          {podium.length > 0 && (
+            <div className="podium">
+              {podium.map((entry, i) => (
+                <article className={`podium-card rank-${i + 1}`} key={entry.address}>
+                  <div className="podium-art">
+                    {entry.image ? <img src={entry.image} alt={`NPC held by ${shortAddress(entry.address)}`} loading="lazy" /> : null}
+                  </div>
+                  <span className="podium-rank">
+                    {i === 0 ? (
+                      <>
+                        <Crown size={15} /> TOP MINTER
+                      </>
+                    ) : (
+                      <>#{i + 1} IN TOWN</>
+                    )}
+                  </span>
+                  <a href={`${explorerUrl}/address/${entry.address}`} target="_blank" rel="noreferrer" className="board-address">
+                    {shortAddress(entry.address)} <ArrowUpRight size={12} />
+                    {paidWallets.includes(entry.address) && <span className="patron-badge">PATRON</span>}
+                  </a>
+                  <strong>
+                    {entry.count} NPC{entry.count > 1 ? "s" : ""}
+                  </strong>
+                  <small>{entry.character ? `SHOWN: ${entry.character.toUpperCase()}` : "NPC HOOD HOLDER"}</small>
+                  {i === 0 && rows.length > 1 ? (
+                    <small className="board-gap">REIGNING — DEFEND THE CROWN</small>
+                  ) : (
+                    <small className="board-gap">{topCount - entry.count + 1} TO TAKE THE CROWN</small>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
           <ol className="board-list">
-            {rows.map((row, index) => (
-              <li className="board-row" key={row.address}>
-                <span className="board-rank">
-                  {index === 0 ? <Crown size={15} /> : String(index + 1).padStart(2, "0")}
-                </span>
-                <a href={`${explorerUrl}/address/${row.address}`} target="_blank" rel="noreferrer" className="board-address">
-                  {shortAddress(row.address)} <ArrowUpRight size={12} />
-                  {paidWallets.includes(row.address) && <span className="patron-badge">PATRON</span>}
-                </a>
-                <span className="board-bar" aria-hidden="true">
-                  <span style={{ width: `${topCount > 0 ? (row.count / topCount) * 100 : 0}%` }} />
-                </span>
-                <strong className="board-count">
-                  {row.count} NPC{row.count > 1 ? "s" : ""}
-                  {total ? <small> · {((row.count / total) * 100).toFixed(1)}% of minted</small> : null}
-                  {index === 0 && rows.length > 1 ? <small className="board-gap">REIGNING — DEFEND THE CROWN</small> : null}
-                  {index > 0 ? <small className="board-gap">{topCount - row.count + 1} TO TAKE THE CROWN</small> : null}
-                </strong>
-              </li>
-            ))}
+            {rows.slice(podium.length).map((row, i) => {
+              const index = i + podium.length;
+              return (
+                <li className="board-row" key={row.address}>
+                  <span className="board-rank">{String(index + 1).padStart(2, "0")}</span>
+                  <a href={`${explorerUrl}/address/${row.address}`} target="_blank" rel="noreferrer" className="board-address">
+                    {shortAddress(row.address)} <ArrowUpRight size={12} />
+                    {paidWallets.includes(row.address) && <span className="patron-badge">PATRON</span>}
+                  </a>
+                  <span className="board-bar" aria-hidden="true">
+                    <span style={{ width: `${topCount > 0 ? (row.count / topCount) * 100 : 0}%` }} />
+                  </span>
+                  <strong className="board-count">
+                    {row.count} NPC{row.count > 1 ? "s" : ""}
+                    {total ? <small> · {((row.count / total) * 100).toFixed(1)}% of minted</small> : null}
+                    <small className="board-gap">{topCount - row.count + 1} TO TAKE THE CROWN</small>
+                  </strong>
+                </li>
+              );
+            })}
           </ol>
         </>
       )}

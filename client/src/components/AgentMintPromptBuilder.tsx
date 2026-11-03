@@ -66,7 +66,6 @@ export default function AgentMintPromptBuilder({
   contractAddress,
   currency,
   configured,
-  mintOpen,
   quantity,
 }: AgentMintPromptBuilderProps) {
   const [walletAddress, setWalletAddress] = useState("");
@@ -90,12 +89,12 @@ export default function AgentMintPromptBuilder({
     safeConfiguration && validAddress && quantity >= 1 && quantity <= 20;
 
   const promptFor = (mode: MintMode) => {
-    if (!canCopy || chainId === null)
-      return "The prompt becomes available once the wallet address, network, and contract are configured correctly.";
+    if (!safeConfiguration || chainId === null)
+      return "The prompt becomes available once the network and contract are configured correctly.";
     return makePrompt({
       mode,
       quantity,
-      walletAddress: normalizedAddress,
+      walletAddress: validAddress ? normalizedAddress : "YOUR_WALLET_ADDRESS",
       chainId,
       chainName,
       contractAddress,
@@ -115,9 +114,7 @@ export default function AgentMintPromptBuilder({
       await navigator.clipboard.writeText(promptFor(mode));
       setCopiedMode(mode);
       setStatus(
-        mintOpen
-          ? `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt copied. Review the prompt and the transaction details before approving anything in your wallet.`
-          : `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt copied. Mint is still closed — the agent can execute it once the owner opens minting.`
+        `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt copied. Review the prompt and the transaction details before approving anything in your wallet.`
       );
     } catch {
       setCopiedMode(null);
@@ -253,6 +250,13 @@ export default function AgentMintPromptBuilder({
           {renderPromptCard("free")}
           {renderPromptCard("paid")}
         </div>
+
+        {safeConfiguration && !validAddress && (
+          <p className="agent-preview-note">
+            Preview — the prompts above use a placeholder address. Enter your wallet
+            address (or connect your wallet) to enable copying.
+          </p>
+        )}
 
         <div className="agent-notice" role="note">
           <ShieldCheck size={15} />

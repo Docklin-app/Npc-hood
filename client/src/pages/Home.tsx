@@ -92,6 +92,7 @@ export default function Home() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [lastMintIds, setLastMintIds] = useState<number[]>([]);
+  const [connecting, setConnecting] = useState(false);
 
   const remaining = minted === null ? null : Math.max(0, TOTAL_SUPPLY - minted);
   const perItem = mode === "free" ? FREE_FEE : PAID_PRICE;
@@ -171,18 +172,26 @@ export default function Home() {
   const connectWallet = async () => {
     setNotice("");
     if (!window.ethereum) {
-      setNotice("No Web3 wallet found. Open this page in a browser with an EVM wallet.");
+      setNotice("No Web3 wallet found in this browser. Open npcshood.xyz inside your wallet app's browser (MetaMask, Trust Wallet, or Binance Wallet) — a regular browser tab cannot connect a wallet.");
       return;
     }
+    setConnecting(true);
     try {
       const provider = new BrowserProvider(window.ethereum as ConstructorParameters<typeof BrowserProvider>[0]);
-      const accounts = await provider.send("eth_requestAccounts", []) as string[];
+      let accounts: string[];
+      try {
+        accounts = await provider.send("eth_requestAccounts", []) as string[];
+      } catch {
+        accounts = await window.ethereum.request({ method: "eth_requestAccounts" }) as string[];
+      }
       const network = await provider.getNetwork();
       setAccount(accounts[0] ?? null);
       setWalletChain(Number(network.chainId));
       await refreshSupply(provider);
     } catch (error) {
       setNotice(getErrorMessage(error));
+    } finally {
+      setConnecting(false);
     }
   };
 
@@ -318,14 +327,18 @@ export default function Home() {
           <span className={hasConfig ? "network-pill network-ready" : "network-pill"} title={hasConfig ? `Chain ID ${CHAIN_ID}` : "Chain not configured"}>
             <span className="network-dot" /> {hasConfig ? CHAIN_NAME : "NETWORK SETUP"}
           </span>
-          <button className="wallet-button" onClick={connectWallet}>
-            <Wallet size={15} strokeWidth={2.2} /> {account ? shortAddress(account) : "CONNECT WALLET"}
+          <button className="wallet-button" onClick={connectWallet} disabled={connecting}>
+            {connecting ? <span className="button-spinner" /> : <Wallet size={15} strokeWidth={2.2} />} {account ? shortAddress(account) : connecting ? "CONNECTING…" : "CONNECT WALLET"}
           </button>
           <button className="nav-toggle" aria-label={mobileNavOpen ? "Close menu" : "Open menu"} onClick={() => setMobileNavOpen(!mobileNavOpen)}>
             {mobileNavOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>
+
+      {notice && txState === "idle" && (
+        <div className="wallet-banner" role="status" aria-live="polite">{notice}</div>
+      )}
 
       <main>
         <section className="hero-section" aria-labelledby="hero-title">
@@ -385,7 +398,7 @@ export default function Home() {
               <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
               <div className="progress-legend"><span>{remaining === null ? "On-chain count appears after connection" : `${remaining.toLocaleString("en-US")} REMAINING`}</span><Layers3 size={14} /></div>
             </div>
-            <button className={hasConfig && mintOpen ? "mint-submit" : "mint-submit disabled"} onClick={submitMint} disabled={!hasConfig || !account || !onTargetNetwork || !contractVerified || !mintOpen || txState === "signature" || txState === "pending"}>
+            <button className={hasConfig && mintOpen ? "mint-submit" : "mint-submit disabled"} onClick={submitMint} disabled={!hasConfig || txState === "signature" || txState === "pending"}>
               {txState === "signature" || txState === "pending" ? <span className="button-spinner" /> : <span className="mint-submit-mark">✳</span>}
               {mintLabel}<ArrowUpRight size={17} />
             </button>

@@ -452,3 +452,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
   .board-bar { display: none; }
   .town-chapter-state { margin-left: 0; }
 }
+
+/* === Wallet banner + prompt preview note === */
+.wallet-banner { max-width: 1240px; margin: 14px auto 0; padding: 12px 18px; background: #fdf3d7; border: 1px solid var(--gold); color: var(--pine-deep); font-size: 12px; line-height: 1.7; }
+@media (max-width: 1300px) { .wallet-banner { margin-left: 20px; margin-right: 20px; } }
+.agent-preview-note { margin-top: 14px; color: #b88930; font: 10px var(--mono); letter-spacing: .04em; line-height: 1.8; }

@@ -417,6 +417,7 @@ export default function Home() {
 
       </main>
 
+      <footer className="site-footer"><a href="#top" className="footer-brand"><PixelMark /> NPC HOOD</a><span>Built by <a href="https://x.com/NPChood_xyz" target="_blank" rel="noreferrer">@NPChood_xyz</a></span><a href="#top" className="back-top">BACK TO TOP ↑</a></footer>
     </div>
   );
 }

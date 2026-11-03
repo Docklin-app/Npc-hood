@@ -405,7 +405,6 @@ export default function Home() {
           <div className="faq-list">
             {[
               { q: "What is the difference between Free Mint and Paid Mint?", a: "Free Mint charges a project fee of 0.0001 native currency per NFT. Paid Mint costs 0.0003 native currency per NFT. Network gas is shown separately by your wallet before you approve the transaction." },
-              { q: "Where do mint payments go?", a: "Payments go into the NPC HOOD smart contract balance. The contract owner can withdraw the balance through the withdraw() function. The owner address is the wallet that deployed the contract." },
               { q: "Which network does NPC HOOD use?", a: "NPC HOOD runs on BNB Smart Chain (chain ID 56). Make sure your wallet is on that network before minting — the site will offer to switch networks if your wallet is still on another one." },
             ].map((item, index) => (
               <article className={faqOpen === index ? "faq-item open" : "faq-item"} key={item.q}>

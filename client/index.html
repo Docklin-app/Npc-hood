@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta name="theme-color" content="#f4f1e8" />
     <meta name="description" content="NPC HOOD — a hooded little pixel universe. Mint is live on BNB Chain: claim a green-hooded NPC from the 10,000-piece collection. Free mint 0.0001 BNB." />
     <meta property="og:title" content="NPC HOOD — A Hooded Little Universe" />
@@ -29,5 +32,33 @@
     <div id="root"></div>
     <script src="/api/platform/config.js"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Freshness guard: phone browsers love caching this page, which used to
+      // hide new deploys behind an old bundle. Compare the bundle this page
+      // loaded with the one a no-store fetch of the page itself references,
+      // and reload once (guarded per session) when a newer deploy exists.
+      (function () {
+        try {
+          var tag = document.querySelector('script[src*="/assets/main-"]');
+          var current = tag ? tag.getAttribute("src") : null;
+          if (current && current.charAt(0) === ".") current = current.slice(1);
+          if (!current) return;
+          if (sessionStorage.getItem("npchood:bundle") === current) return;
+          fetch(location.pathname + "?fresh=" + Date.now(), { cache: "no-store" })
+            .then(function (r) {
+              return r.ok ? r.text() : "";
+            })
+            .then(function (html) {
+              var match = html.match(/\/assets\/main-[^"]+\.js/);
+              var latest = match ? match[0] : null;
+              sessionStorage.setItem("npchood:bundle", latest || current);
+              if (latest && latest !== current) {
+                location.replace(location.pathname + "?v=" + encodeURIComponent(latest) + location.hash);
+              }
+            })
+            .catch(function () {});
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>

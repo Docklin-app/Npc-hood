@@ -10,7 +10,7 @@ import {
   type RarityData,
   type TokenMeta,
 } from "@/lib/hoodData";
-import { buildShareCardBlob, downloadBlob } from "@/lib/shareCard";
+import { buildRankCardBlob, buildShareCardBlob, downloadBlob, rankShareText, shareOnXUrl } from "@/lib/shareCard";
 
 type MyNpcsProps = {
   account: string | null;
@@ -42,6 +42,14 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
   const [tokens, setTokens] = useState<OwnedToken[] | null>(null);
   const [error, setError] = useState("");
   const [sharingId, setSharingId] = useState<number | null>(null);
+  const [sharingRank, setSharingRank] = useState(false);
+  const [race, setRace] = useState<{
+    rank: number;
+    count: number;
+    leaderCount: number;
+    leaderAddress: string;
+    holders: number;
+  } | null>(null);
   const runRef = useRef(0);
 
   const load = useCallback(
@@ -49,6 +57,7 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
       const run = ++runRef.current;
       setError("");
       setTokens(null);
+      setRace(null);
       setScanning(true);
       setProgress(null);
       try {
@@ -64,6 +73,25 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
         scan.owners.forEach((owner, index) => {
           if (owner === wanted) ids.push(index + 1);
         });
+        const holderCounts = new Map<string, number>();
+        for (const owner of scan.owners) {
+          if (owner) holderCounts.set(owner, (holderCounts.get(owner) ?? 0) + 1);
+        }
+        let raceInfo: { rank: number; count: number; leaderCount: number; leaderAddress: string; holders: number } | null =
+          null;
+        if (holderCounts.size > 0) {
+          const leaderEntry = [...holderCounts.entries()].sort(
+            (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+          )[0];
+          const rank = 1 + [...holderCounts.values()].filter((count) => count > ids.length).length;
+          raceInfo = {
+            rank,
+            count: ids.length,
+            leaderCount: leaderEntry[1],
+            leaderAddress: leaderEntry[0],
+            holders: holderCounts.size,
+          };
+        }
         const owned: OwnedToken[] = [];
         for (const id of ids) {
           const meta = await fetchTokenMeta(contractAddress, id);
@@ -72,6 +100,7 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
         }
         if (runRef.current !== run) return;
         owned.sort((a, b) => (a.rank ?? Number.MAX_SAFE_INTEGER) - (b.rank ?? Number.MAX_SAFE_INTEGER));
+        setRace(raceInfo);
         setTokens(owned);
       } catch (err) {
         if (runRef.current === run) {
@@ -119,9 +148,31 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
     }
   };
 
+  const shareRank = async () => {
+    if (!race || !target) return;
+    setSharingRank(true);
+    try {
+      const blob = await buildRankCardBlob({
+        rank: race.rank,
+        holders: race.holders,
+        count: race.count,
+        gap: race.leaderCount - race.count + 1,
+        isLeader: race.rank === 1,
+        address: target,
+        image: tokens && tokens.length > 0 ? tokens[0].meta.image : undefined,
+      });
+      downloadBlob(blob, `npc-hood-rank-${race.rank}.png`);
+    } catch {
+      // The card is a bonus; failing silently keeps the page calm.
+    } finally {
+      setSharingRank(false);
+    }
+  };
+
   if (!configured) return null;
 
   const best = tokens && tokens.length > 0 ? tokens[0] : null;
+  const crownGap = race ? race.leaderCount - race.count + 1 : 0;
 
   return (
     <section className="recent-section hood-section" id="my-npcs" aria-labelledby="my-npcs-title">
@@ -189,6 +240,42 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
                   best && best.rank !== null ? ` · Rarest: #${padTokenId(best.meta.id)} at rarity rank #${best.rank.toLocaleString("en-US")}` : ""
                 }`}
           </p>
+          {race && race.count > 0 && (
+            <div className="rank-banner">
+              <p>
+                {race.rank === 1 ? (
+                  <>
+                    👑 <strong>#{race.rank} of {race.holders} holders — REIGNING TOP MINTER</strong> with {race.count}{" "}
+                    NPC{race.count > 1 ? "s" : ""}. The crown is yours to lose.
+                  </>
+                ) : (
+                  <>
+                    🏁 <strong>
+                      #{race.rank} of {race.holders} holders
+                    </strong>{" "}
+                    with {race.count} NPC{race.count > 1 ? "s" : ""} — {crownGap} more to take the crown from{" "}
+                    {shortAddress(race.leaderAddress)}.
+                  </>
+                )}
+              </p>
+              <div className="hood-actions">
+                <button className="share-button" onClick={() => void shareRank()} disabled={sharingRank}>
+                  <Download size={12} /> {sharingRank ? "RENDERING…" : "SHARE MY RANK"}
+                </button>
+                <a
+                  className="share-button"
+                  href={shareOnXUrl(
+                    rankShareText({ rank: race.rank, count: race.count, gap: crownGap, isLeader: race.rank === 1 }),
+                    "https://npcshood.xyz",
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  POST ON X <ArrowUpRight size={12} />
+                </a>
+              </div>
+            </div>
+          )}
           <div className="hood-grid">
             {tokens.map((token) => {
               const rarest = token.traits.reduce(

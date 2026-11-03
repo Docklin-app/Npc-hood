@@ -423,6 +423,13 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
 .board-bar span { display: block; height: 100%; background: var(--gold); }
 .board-count { color: var(--pine-deep); font-size: 12px; text-align: right; }
 .board-count small { color: var(--muted); font: 9px var(--mono); }
+.board-count .board-gap { display: block; margin-top: 3px; color: #b88930; letter-spacing: .06em; }
+.board-crown-line { margin: 22px 0 -6px; color: var(--pine); font: 11px var(--mono); letter-spacing: .05em; line-height: 1.8; }
+.rank-banner { margin-top: 18px; padding: 16px 18px; background: #fdf3d7; border: 1px solid var(--gold); color: var(--pine-deep); }
+.rank-banner p { margin: 0; font-size: 12.5px; line-height: 1.8; }
+.rank-banner .hood-actions { margin-top: 12px; }
+.founder-line { margin-top: 10px; color: var(--pine); font: 11px var(--mono); letter-spacing: .04em; line-height: 1.9; }
+.founder-line a { color: var(--pine); }
 
 /* === Town awakening === */
 .town-scene { margin-top: 34px; border: 1px solid var(--pine-deep); background: #0c271b; box-shadow: 6px 6px 0 var(--gold); }

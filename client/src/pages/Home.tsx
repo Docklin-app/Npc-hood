@@ -21,6 +21,7 @@ import RecentMints from "@/components/RecentMints";
 import ShareMint from "@/components/ShareMint";
 import MyNpcs from "@/components/MyNpcs";
 import Leaderboard from "@/components/Leaderboard";
+import RaceToChapter from "@/components/RaceToChapter";
 import TownAwakening from "@/components/TownAwakening";
 
 type InjectedWallet = {
@@ -436,6 +437,13 @@ export default function Home() {
         />
 
         <Leaderboard
+          contractAddress={CONTRACT_ADDRESS}
+          explorerUrl={EXPLORER_URL}
+          configured={hasConfig}
+          refreshSignal={minted}
+        />
+
+        <RaceToChapter
           contractAddress={CONTRACT_ADDRESS}
           explorerUrl={EXPLORER_URL}
           configured={hasConfig}

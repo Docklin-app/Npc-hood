@@ -84,25 +84,33 @@ export default function Leaderboard({ contractAddress, explorerUrl, configured, 
         <p className="hood-summary">Mint is open and no one has claimed a hood yet — the first minter takes the crown.</p>
       )}
       {rows && rows.length > 0 && (
-        <ol className="board-list">
-          {rows.map((row, index) => (
-            <li className="board-row" key={row.address}>
-              <span className="board-rank">
-                {index === 0 ? <Crown size={15} /> : String(index + 1).padStart(2, "0")}
-              </span>
-              <a href={`${explorerUrl}/address/${row.address}`} target="_blank" rel="noreferrer" className="board-address">
-                {shortAddress(row.address)} <ArrowUpRight size={12} />
-              </a>
-              <span className="board-bar" aria-hidden="true">
-                <span style={{ width: `${topCount > 0 ? (row.count / topCount) * 100 : 0}%` }} />
-              </span>
-              <strong className="board-count">
-                {row.count} NPC{row.count > 1 ? "s" : ""}
-                {total ? <small> · {((row.count / total) * 100).toFixed(1)}% of minted</small> : null}
-              </strong>
-            </li>
-          ))}
-        </ol>
+        <>
+          <p className="board-crown-line">
+            The crown falls at {topCount + 1} NPC{topCount + 1 > 1 ? "s" : ""} — any single wallet holding {topCount + 1}{" "}
+            takes the board.
+          </p>
+          <ol className="board-list">
+            {rows.map((row, index) => (
+              <li className="board-row" key={row.address}>
+                <span className="board-rank">
+                  {index === 0 ? <Crown size={15} /> : String(index + 1).padStart(2, "0")}
+                </span>
+                <a href={`${explorerUrl}/address/${row.address}`} target="_blank" rel="noreferrer" className="board-address">
+                  {shortAddress(row.address)} <ArrowUpRight size={12} />
+                </a>
+                <span className="board-bar" aria-hidden="true">
+                  <span style={{ width: `${topCount > 0 ? (row.count / topCount) * 100 : 0}%` }} />
+                </span>
+                <strong className="board-count">
+                  {row.count} NPC{row.count > 1 ? "s" : ""}
+                  {total ? <small> · {((row.count / total) * 100).toFixed(1)}% of minted</small> : null}
+                  {index === 0 && rows.length > 1 ? <small className="board-gap">REIGNING — DEFEND THE CROWN</small> : null}
+                  {index > 0 ? <small className="board-gap">{topCount - row.count + 1} TO TAKE THE CROWN</small> : null}
+                </strong>
+              </li>
+            ))}
+          </ol>
+        </>
       )}
     </section>
   );

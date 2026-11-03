@@ -87,10 +87,9 @@ export default function AgentMintPromptBuilder({
     currency.trim() !== "" &&
     currency !== "NATIVE";
   const canCopy =
-    safeConfiguration && mintOpen && validAddress && quantity >= 1 && quantity <= 20;
+    safeConfiguration && validAddress && quantity >= 1 && quantity <= 20;
 
   const promptFor = (mode: MintMode) => {
-    if (!mintOpen) return "Mint is still closed by the owner; the prompt is not available yet.";
     if (!canCopy || chainId === null)
       return "The prompt becomes available once the wallet address, network, and contract are configured correctly.";
     return makePrompt({
@@ -107,9 +106,7 @@ export default function AgentMintPromptBuilder({
   const copyPrompt = async (mode: MintMode) => {
     if (!canCopy) {
       setStatus(
-        mintOpen
-          ? "Enter a valid 0x wallet address and make sure the chain and contract configuration are available."
-          : "Mint is still closed by the owner. Prompts become available after the owner opens minting."
+        "Enter a valid 0x wallet address and make sure the chain and contract configuration are available."
       );
       return;
     }
@@ -118,7 +115,9 @@ export default function AgentMintPromptBuilder({
       await navigator.clipboard.writeText(promptFor(mode));
       setCopiedMode(mode);
       setStatus(
-        `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt copied. Review the prompt and the transaction details before approving anything in your wallet.`
+        mintOpen
+          ? `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt copied. Review the prompt and the transaction details before approving anything in your wallet.`
+          : `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt copied. Mint is still closed — the agent can execute it once the owner opens minting.`
       );
     } catch {
       setCopiedMode(null);

@@ -533,3 +533,39 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
   .town-star, .win-lit, .lantern-glow, .town-moon, .shooting-star, .walker, .walker-bob, .sparkle, .pixel-burst span { animation: none !important; }
   .shooting-star, .pixel-burst { display: none; }
 }
+
+/* Live ticker under the header */
+.live-ticker { background: var(--pine-deep); color: var(--paper); border-bottom: 2px solid var(--gold); overflow: hidden; }
+.ticker-track { display: flex; width: max-content; animation: ticker-scroll 55s linear infinite; }
+.live-ticker:hover .ticker-track { animation-play-state: paused; }
+.ticker-seq { display: inline-flex; align-items: center; }
+.ticker-item { display: inline-flex; align-items: center; gap: 14px; padding: 8px 7px 8px 21px; font: 10px var(--mono); letter-spacing: 0.1em; white-space: nowrap; }
+.ticker-sep { color: var(--gold); }
+@keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Hero live fact */
+.fact-number .live-dot { margin-right: 7px; }
+
+/* NFT detail modal */
+.token-modal-backdrop { position: fixed; inset: 0; z-index: 80; background: rgba(12, 39, 27, 0.72); display: flex; align-items: center; justify-content: center; padding: 18px; overflow-y: auto; }
+.token-modal { position: relative; background: var(--paper); border: 1px solid var(--pine-deep); box-shadow: 10px 10px 0 rgba(12, 39, 27, 0.45); max-width: 880px; width: 100%; display: grid; grid-template-columns: 340px 1fr; animation: toast-in 0.3s ease-out; }
+.token-modal-close { position: absolute; top: 10px; right: 10px; z-index: 2; background: var(--pine-deep); color: var(--paper); border: 1px solid var(--gold); width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.token-modal-art { background: #1a422f; padding: 12px; display: flex; }
+.token-modal-art img { width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated; display: block; border: 1px solid rgba(244, 241, 232, 0.25); }
+.token-modal-loading { margin: auto; color: var(--paper); font: 11px var(--mono); letter-spacing: 0.12em; }
+.token-modal-body { padding: 26px 26px 22px; min-width: 0; }
+.token-modal-body h3 { color: var(--pine-deep); font-size: 30px; margin: 8px 0 10px; line-height: 1.1; }
+.token-modal-status { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; color: var(--muted); font: 10px var(--mono); letter-spacing: 0.06em; line-height: 1.7; margin-bottom: 16px; }
+.token-modal-status a { color: var(--pine); }
+.token-modal-actions { margin-top: 18px; }
+@media (max-width: 700px) { .token-modal { grid-template-columns: 1fr; } .token-modal-art { padding: 10px; } .token-modal-body { padding: 20px 18px; } }
+
+/* Clickable cards + challenge box */
+.explorer-card, .podium-card { cursor: pointer; }
+.board-challenge { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; margin-top: 26px; border: 1px dashed var(--gold); background: rgba(228, 184, 72, 0.08); padding: 16px 18px; }
+.board-challenge p { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 0; }
+.board-challenge p strong { color: var(--pine-deep); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none !important; }
+}

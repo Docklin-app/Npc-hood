@@ -345,3 +345,21 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
 .owner-audit-alert { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 14px; padding: 12px 13px; border: 1px solid rgba(228,184,72,.45); background: rgba(228,184,72,.08); color: #d9d1b6; font: 8px/1.7 var(--mono); }
 .owner-audit-alert svg { flex: none; margin-top: 1px; color: var(--gold-bright); }
 .owner-audit-alert strong { color: var(--gold-bright); }
+
+/* Recently minted — live from the contract */
+.recent-section { max-width: 1240px; margin: 0 auto; padding: 70px 30px 10px; }
+.recent-heading .section-kicker { color: var(--green); }
+.recent-heading h2 { margin: 17px 0 0; font-size: clamp(40px, 5vw, 62px); line-height: .9; letter-spacing: -.08em; color: var(--pine-deep); }
+.recent-heading h2 em { color: #b88930; }
+.recent-heading > p { margin: 16px 0 0; max-width: 560px; color: #70756a; font-size: 11px; line-height: 1.8; }
+.recent-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 34px; }
+.recent-card { display: block; text-decoration: none; min-width: 0; }
+.recent-card-top { display: flex; justify-content: space-between; padding: 0 1px 9px; color: #74786b; font: 8px var(--mono); letter-spacing: .08em; }
+.recent-art { aspect-ratio: 1; padding: 8px; background: #1a422f; border: 1px solid var(--pine-deep); box-shadow: 4px 4px 0 var(--gold); overflow: hidden; transition: transform .22s, box-shadow .22s; }
+.recent-card:hover .recent-art { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--gold); }
+.recent-art img { width: 100%; height: 100%; display: block; object-fit: cover; image-rendering: pixelated; border: 1px solid rgba(244, 241, 232, .25); background: radial-gradient(circle at 50% 38%, #65804b, #123326 67%); }
+.recent-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 13px 1px; color: #74786b; font: 8px var(--mono); letter-spacing: .06em; border-bottom: 1px solid var(--line); }
+.recent-meta span:first-child { color: var(--pine); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recent-meta span:last-child { display: inline-flex; gap: 5px; align-items: center; flex: none; }
+@media (max-width: 900px) { .recent-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .recent-section { padding: 50px 20px 0; } .recent-grid { grid-template-columns: 1fr; gap: 22px; } }

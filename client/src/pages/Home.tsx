@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { NPC_HOOD_ABI } from "@/lib/npcHoodAbi";
 import AgentMintPromptBuilder from "@/components/AgentMintPromptBuilder";
+import RecentMints from "@/components/RecentMints";
 
 type InjectedWallet = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
@@ -371,6 +372,13 @@ export default function Home() {
             <p className="mint-disclaimer"><ShieldCheck size={12} /> Review network, amount, and gas in your wallet. Never share your recovery phrase.</p>
           </div>
         </section>
+
+        <RecentMints
+          contractAddress={CONTRACT_ADDRESS}
+          explorerUrl={EXPLORER_URL}
+          configured={hasConfig}
+          refreshSignal={minted}
+        />
 
         <AgentMintPromptBuilder
           account={account}

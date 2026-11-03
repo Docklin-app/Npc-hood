@@ -4,6 +4,8 @@ export const NPC_HOOD_ABI = [
   "function FREE_MINT_FEE() view returns (uint256)",
   "function PAID_MINT_PRICE() view returns (uint256)",
   "function totalMinted() view returns (uint256)",
+  "function tokenURI(uint256 tokenId) view returns (string)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
   "function mintOpen() view returns (bool)",
   "function name() view returns (string)",
   "function symbol() view returns (string)",

@@ -31,8 +31,6 @@ function makePrompt({
   mode,
   quantity,
   walletAddress,
-  chainId,
-  chainName,
   contractAddress,
   currency,
 }: {
@@ -45,22 +43,20 @@ function makePrompt({
   currency: string;
 }) {
   const isFree = mode === "free";
-  const method = isFree ? "freeMint" : "paidMint";
   const unitPrice = isFree ? FREE_MINT_FEE : PAID_MINT_PRICE;
   const unitPriceText = formatEther(unitPrice);
   const totalValueText = formatEther(unitPrice * BigInt(quantity));
-  const routeName = isFree ? "Free Mint" : "Paid Mint";
+  const routeName = isFree ? "Free mint" : "Paid mint";
+  const headline = isFree ? "free mint only" : "paid mint";
 
   return [
-    `Prepare an NPC HOOD ${routeName} for me.`,
-    `Network: ${safeLabel(chainName)} (chain ID ${chainId}). Use exactly this chain.`,
-    `NPC HOOD contract: ${contractAddress}. Do not use another contract, token, treasury, or recipient address.`,
-    `Signing wallet: ${walletAddress}. The contract mints to msg.sender; only proceed if the active wallet is exactly this address.`,
-    `Mint call: ${method}(${quantity}) with msg.value exactly ${totalValueText} ${safeLabel(currency)} (${unitPriceText} ${safeLabel(currency)} per NFT × ${quantity}). Network gas is separate.`,
-    "Before preparing the transaction, read the contract on the specified chain and verify mintOpen() is true, MAX_SUPPLY() is 10000, MAX_PER_TX() is 20, FREE_MINT_FEE() is 0.0001 native coin, PAID_MINT_PRICE() is 0.0003 native coin, and totalMinted() + quantity does not exceed MAX_SUPPLY(). Stop if mintOpen() is false or any value, network, or contract does not match.",
-    "Show me the complete unsigned transaction details first: chain and chain ID, contract, method, quantity, value, signing wallet, estimated gas, and total cost. Wait for my explicit approval in the wallet before signing or sending exactly this mint call. Do not submit, broadcast, or approve anything else.",
-    "Never ask for, display, or transmit a seed phrase or private key. Do not call owner-only functions such as withdraw(), setCollectionBaseURI(), or setMintOpen(). If you cannot use the specified wallet or verify the contract, stop and explain why.",
-  ].join("\n\n");
+    `Mint ${quantity} NPC HOOD NFT(s) for me on BNB Chain (${headline}).`,
+    `- Collection: NPC HOOD (HOOD), total supply 10,000`,
+    `- Contract: ${contractAddress}`,
+    `- ${routeName}: ${quantity} NFT(s), ${totalValueText} ${safeLabel(currency)} total (${quantity} × ${unitPriceText} ${safeLabel(currency)}${isFree ? " fee" : ""}, plus gas)`,
+    `- Sign with wallet: ${walletAddress}`,
+    `- Execute now. Reply with the transaction link when done.`,
+  ].join("\n");
 }
 
 export default function AgentMintPromptBuilder({

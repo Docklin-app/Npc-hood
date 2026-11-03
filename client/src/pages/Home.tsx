@@ -18,6 +18,10 @@ import {
 import { NPC_HOOD_ABI } from "@/lib/npcHoodAbi";
 import AgentMintPromptBuilder from "@/components/AgentMintPromptBuilder";
 import RecentMints from "@/components/RecentMints";
+import ShareMint from "@/components/ShareMint";
+import MyNpcs from "@/components/MyNpcs";
+import Leaderboard from "@/components/Leaderboard";
+import TownAwakening from "@/components/TownAwakening";
 
 type InjectedWallet = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
@@ -87,6 +91,7 @@ export default function Home() {
   const [notice, setNotice] = useState("");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
+  const [lastMintIds, setLastMintIds] = useState<number[]>([]);
 
   const remaining = minted === null ? null : Math.max(0, TOTAL_SUPPLY - minted);
   const perItem = mode === "free" ? FREE_FEE : PAID_PRICE;
@@ -262,7 +267,25 @@ export default function Home() {
       setTxHash(transaction.hash as string);
       setTxState("pending");
       setNotice("Transaction sent. Waiting for network confirmation.");
-      await transaction.wait();
+      const receipt = await transaction.wait();
+      const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+      const mintedIds: number[] = [];
+      if (receipt && account) {
+        const meTopic = `0x${account.toLowerCase().replace("0x", "").padStart(64, "0")}`;
+        const zeroTopic = `0x${"0".repeat(64)}`;
+        for (const log of receipt.logs) {
+          const topics = (log as { topics?: readonly string[] }).topics ?? [];
+          if (
+            topics[0]?.toLowerCase() === TRANSFER_TOPIC &&
+            topics[1]?.toLowerCase() === zeroTopic &&
+            topics[2]?.toLowerCase() === meTopic &&
+            topics[3]
+          ) {
+            mintedIds.push(Number(BigInt(topics[3])));
+          }
+        }
+      }
+      if (mintedIds.length > 0) setLastMintIds(mintedIds);
       setTxState("success");
       setNotice("Mint successful. Thank you for being part of NPC HOOD.");
       await refreshSupply(provider);
@@ -286,6 +309,8 @@ export default function Home() {
           <a href="#collection" onClick={() => setMobileNavOpen(false)}>Collection</a>
           <a href="#mint" onClick={() => setMobileNavOpen(false)}>Mint</a>
           <a href="#agent-mint" onClick={() => setMobileNavOpen(false)}>AI Agent</a>
+          <a href="#my-npcs" onClick={() => setMobileNavOpen(false)}>My Hood</a>
+          <a href="#town" onClick={() => setMobileNavOpen(false)}>Town</a>
           <a href="#lore" onClick={() => setMobileNavOpen(false)}>Story</a>
           <a href="#faq" onClick={() => setMobileNavOpen(false)}>FAQ</a>
         </nav>
@@ -373,7 +398,31 @@ export default function Home() {
           </div>
         </section>
 
+        {lastMintIds.length > 0 && (
+          <ShareMint
+            tokenIds={lastMintIds}
+            contractAddress={CONTRACT_ADDRESS}
+            explorerUrl={EXPLORER_URL}
+            onClose={() => setLastMintIds([])}
+          />
+        )}
+
         <RecentMints
+          contractAddress={CONTRACT_ADDRESS}
+          explorerUrl={EXPLORER_URL}
+          configured={hasConfig}
+          refreshSignal={minted}
+        />
+
+        <MyNpcs
+          account={account}
+          contractAddress={CONTRACT_ADDRESS}
+          explorerUrl={EXPLORER_URL}
+          configured={hasConfig}
+          onConnect={connectWallet}
+        />
+
+        <Leaderboard
           contractAddress={CONTRACT_ADDRESS}
           explorerUrl={EXPLORER_URL}
           configured={hasConfig}
@@ -402,6 +451,12 @@ export default function Home() {
             <article className="gallery-card gallery-card-three"><div className="gallery-art"><img src="/assets/npc-hood-gallery-3.webp" alt="Explorer in a green hood with a gold-trimmed mask" loading="lazy" /></div><div className="gallery-meta"><span>FILE 1028 / GOLDEN HOUR</span><span>03 <ArrowUpRight size={13} /></span></div></article>
           </div>
         </section>
+
+        <TownAwakening
+          contractAddress={CONTRACT_ADDRESS}
+          configured={hasConfig}
+          refreshSignal={minted}
+        />
 
         <section className="lore-section" id="lore">
           <div className="lore-ornament"><PixelMark /><span>THE HOOD CHRONICLES</span></div>

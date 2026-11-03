@@ -40,12 +40,12 @@ const TOTAL_SUPPLY = 10_000;
 const MAX_PER_TX = 20;
 const FREE_FEE = parseEther("0.0001");
 const PAID_PRICE = parseEther("0.0003");
-const CONTRACT_ADDRESS = import.meta.env.VITE_NPC_HOOD_CONTRACT_ADDRESS?.trim() ?? "";
-const CHAIN_ID_RAW = import.meta.env.VITE_NPC_HOOD_CHAIN_ID?.trim() ?? "";
+const CONTRACT_ADDRESS = import.meta.env.VITE_NPC_HOOD_CONTRACT_ADDRESS?.trim() || "0xe986CA162b99B0A3972F37045b83cA15C842b905";
+const CHAIN_ID_RAW = import.meta.env.VITE_NPC_HOOD_CHAIN_ID?.trim() || "56";
 const CHAIN_ID = /^\d+$/.test(CHAIN_ID_RAW) ? Number(CHAIN_ID_RAW) : null;
-const CHAIN_NAME = import.meta.env.VITE_NPC_HOOD_CHAIN_NAME?.trim() || "NETWORK NOT SET";
-const CURRENCY = import.meta.env.VITE_NPC_HOOD_CURRENCY_SYMBOL?.trim() || "NATIVE";
-const EXPLORER_URL = import.meta.env.VITE_NPC_HOOD_EXPLORER_URL?.trim().replace(/\/$/, "") ?? "";
+const CHAIN_NAME = import.meta.env.VITE_NPC_HOOD_CHAIN_NAME?.trim() || "BNB Smart Chain";
+const CURRENCY = import.meta.env.VITE_NPC_HOOD_CURRENCY_SYMBOL?.trim() || "BNB";
+const EXPLORER_URL = import.meta.env.VITE_NPC_HOOD_EXPLORER_URL?.trim().replace(/\/$/, "") || "https://bscscan.com";
 const HERO_IMAGE = "/assets/npc-hood-hero.png";
 
 const isAddress = /^0x[a-fA-F0-9]{40}$/.test(CONTRACT_ADDRESS);

@@ -465,3 +465,71 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
 .wallet-banner { max-width: 1240px; margin: 14px auto 0; padding: 12px 18px; background: #fdf3d7; border: 1px solid var(--gold); color: var(--pine-deep); font-size: 12px; line-height: 1.7; }
 @media (max-width: 1300px) { .wallet-banner { margin-left: 20px; margin-right: 20px; } }
 .agent-preview-note { margin-top: 14px; color: #b88930; font: 10px var(--mono); letter-spacing: .04em; line-height: 1.8; }
+
+/* Living town: twinkling stars, flickering windows, pulsing lanterns,
+   an occasional shooting star, and a hooded walker crossing the street. */
+@keyframes twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.95; } }
+.town-star { animation: twinkle 3.4s ease-in-out infinite; }
+@keyframes win-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+.win-lit { animation: win-flicker 4.2s ease-in-out infinite; }
+@keyframes lantern-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.95; } }
+.lantern-glow { animation: lantern-pulse 2.8s ease-in-out infinite; }
+.town-moon { animation: lantern-pulse 7s ease-in-out infinite; }
+@keyframes shoot { 0%, 86%, 100% { transform: translate(36px, 18px); opacity: 0; } 90% { opacity: 1; } 97% { transform: translate(520px, 84px); opacity: 0; } }
+.shooting-star { animation: shoot 13s linear infinite; opacity: 0; }
+@keyframes walk-x { from { transform: translateX(4px); } to { transform: translateX(796px); } }
+.walker { animation: walk-x 34s linear infinite alternate; }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-2px); } }
+.walker-bob { animation: bob 0.34s ease-in-out infinite alternate; }
+
+/* Hero sparkles */
+.sparkle { position: absolute; z-index: 2; width: 6px; height: 6px; background: #f0ce74; box-shadow: 0 0 9px 2px rgba(240, 206, 116, 0.55); animation: twinkle 2.8s ease-in-out infinite; pointer-events: none; }
+
+/* Live mint toast */
+@keyframes toast-in { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.mint-toast { position: fixed; right: 18px; bottom: 18px; z-index: 70; display: flex; gap: 12px; align-items: center; max-width: min(92vw, 390px); background: var(--pine-deep); color: var(--paper); border: 1px solid var(--gold); box-shadow: 6px 6px 0 rgba(12, 39, 27, 0.35); padding: 10px 12px; animation: toast-in 0.35s ease-out; }
+.mint-toast img { width: 52px; height: 52px; image-rendering: pixelated; border: 2px solid var(--gold); background: var(--paper); }
+.mint-toast strong { display: block; font: 10px var(--mono); letter-spacing: 0.1em; color: var(--gold-bright); }
+.mint-toast span { display: block; font-size: 12px; margin-top: 3px; line-height: 1.5; }
+.mint-toast button { background: none; border: none; color: var(--paper); cursor: pointer; padding: 4px; flex-shrink: 0; }
+
+/* Pixel rain celebration */
+.pixel-burst { position: fixed; inset: 0; z-index: 65; pointer-events: none; overflow: hidden; }
+.pixel-burst span { position: absolute; top: -14px; display: block; animation: pixel-fall 1.9s ease-in forwards; }
+@keyframes pixel-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(106vh) rotate(340deg); opacity: 0; } }
+
+/* Leaderboard podium */
+.podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 26px; align-items: end; }
+.podium-card { border: 1px solid var(--line); background: #fffdf6; padding: 14px; text-align: center; }
+.podium-card.rank-1 { border-color: var(--gold); box-shadow: 5px 5px 0 var(--gold); }
+.podium-art img { width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated; display: block; }
+.podium-rank { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 10px 0 2px; color: #b88930; font: 10px var(--mono); letter-spacing: 0.1em; }
+.podium-card .board-address { justify-content: center; }
+.podium-card strong { display: block; color: var(--pine-deep); font-size: 16px; margin-top: 5px; }
+.podium-card small { display: block; color: var(--muted); font: 8px var(--mono); letter-spacing: 0.08em; margin-top: 3px; }
+.podium-card .board-gap { color: #b88930; font-size: 9px; }
+@media (max-width: 640px) { .podium { gap: 8px; } .podium-card { padding: 8px; } .podium-card strong { font-size: 13px; } }
+
+/* Collection explorer */
+.explorer-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+.explorer-search { display: inline-flex; align-items: center; gap: 8px; flex: 1 1 260px; background: #fffdf6; border: 1px solid var(--line); padding: 0 12px; color: var(--muted); }
+.explorer-search input { flex: 1; min-width: 0; border: none; background: none; color: var(--ink); font: 12px var(--mono); padding: 13px 0; }
+.explorer-search input:focus { outline: none; }
+.explorer-search:focus-within { outline: 2px solid var(--gold); outline-offset: 1px; }
+.explorer-controls select { background: #fffdf6; border: 1px solid var(--line); color: var(--ink); font: 11px var(--mono); padding: 12px 10px; cursor: pointer; }
+.explorer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; margin-top: 18px; }
+.explorer-card { border: 1px solid var(--line); background: #fffdf6; }
+.explorer-card img { width: 100%; aspect-ratio: 1; display: block; image-rendering: pixelated; object-fit: cover; }
+.explorer-card.unminted img { filter: saturate(0.5) brightness(0.94); }
+.explorer-card-body { padding: 9px 10px 11px; }
+.explorer-card-body strong { display: block; color: var(--pine-deep); font-size: 11px; line-height: 1.45; }
+.explorer-card-body strong span { color: var(--muted); font-weight: 400; }
+.explorer-card-body small { display: block; font: 8px var(--mono); letter-spacing: 0.08em; margin-top: 3px; }
+.explorer-rank { color: #b88930; }
+.explorer-status { color: var(--muted); }
+.explorer-more { display: block; margin: 24px auto 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .town-star, .win-lit, .lantern-glow, .town-moon, .shooting-star, .walker, .walker-bob, .sparkle, .pixel-burst span { animation: none !important; }
+  .shooting-star, .pixel-burst { display: none; }
+}

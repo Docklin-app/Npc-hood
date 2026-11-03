@@ -67,8 +67,8 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
         const owned: OwnedToken[] = [];
         for (const id of ids) {
           const meta = await fetchTokenMeta(contractAddress, id);
-          const rarity = rarity ? rarityForToken(rarity, id) : null;
-          owned.push({ meta, rank: rarity?.rank ?? null, traits: rarity?.traits ?? [] });
+          const tokenRarity = rarity ? rarityForToken(rarity, id) : null;
+          owned.push({ meta, rank: tokenRarity?.rank ?? null, traits: tokenRarity?.traits ?? [] });
         }
         if (runRef.current !== run) return;
         owned.sort((a, b) => (a.rank ?? Number.MAX_SAFE_INTEGER) - (b.rank ?? Number.MAX_SAFE_INTEGER));

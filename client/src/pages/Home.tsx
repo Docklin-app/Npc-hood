@@ -23,7 +23,7 @@ import MyNpcs from "@/components/MyNpcs";
 import Leaderboard from "@/components/Leaderboard";
 import RaceToChapter from "@/components/RaceToChapter";
 import CollectionExplorer from "@/components/CollectionExplorer";
-import { fetchTokenMeta, padTokenId, readTokenOwner, readTotalMinted } from "@/lib/hoodData";
+import { FALLBACK_IMAGE_BASE, fetchTokenMeta, padTokenId, readTokenOwner, readTotalMinted } from "@/lib/hoodData";
 import TownAwakening from "@/components/TownAwakening";
 
 type InjectedWallet = {
@@ -51,7 +51,7 @@ const CHAIN_ID = /^\d+$/.test(CHAIN_ID_RAW) ? Number(CHAIN_ID_RAW) : null;
 const CHAIN_NAME = import.meta.env.VITE_NPC_HOOD_CHAIN_NAME?.trim() || "BNB Smart Chain";
 const CURRENCY = import.meta.env.VITE_NPC_HOOD_CURRENCY_SYMBOL?.trim() || "BNB";
 const EXPLORER_URL = import.meta.env.VITE_NPC_HOOD_EXPLORER_URL?.trim().replace(/\/$/, "") || "https://bscscan.com";
-const HERO_IMAGE = "/assets/npc-hood-hero.png";
+const HERO_IMAGE = `${FALLBACK_IMAGE_BASE}2460.png`;
 
 const isAddress = /^0x[a-fA-F0-9]{40}$/.test(CONTRACT_ADDRESS);
 const hasConfig = Boolean(isAddress && CHAIN_ID !== null && Number.isSafeInteger(CHAIN_ID) && CHAIN_ID > 0);
@@ -436,7 +436,7 @@ export default function Home() {
 
           <div className="hero-art-wrap">
             <div className="hero-art-frame">
-              <img src={HERO_IMAGE} alt="Pixel-art character in a green hood and green hat, in a town at dusk" className="hero-art" />
+              <img src={HERO_IMAGE} alt="NPC HOOD #2460, the rarest NPC in the collection: a Pathfinder carrying a lantern staff" className="hero-art" />
               <span className="sparkle" style={{ top: "12%", left: "18%", animationDelay: "0.2s" }} />
               <span className="sparkle" style={{ top: "22%", left: "74%", animationDelay: "1.1s" }} />
               <span className="sparkle" style={{ top: "8%", left: "52%", animationDelay: "1.8s" }} />
@@ -552,9 +552,9 @@ export default function Home() {
             <p>They may be NPCs in another world.<br />Here, every character has a place.</p>
           </div>
           <div className="gallery-grid">
-            <article className="gallery-card gallery-card-one"><div className="gallery-art"><img src="/assets/npc-hood-gallery-1.webp" alt="Forest keeper in a dark green hood" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0002 / THE WATCHER</span><span>01 <ArrowUpRight size={13} /></span></div></article>
-            <article className="gallery-card gallery-card-two"><div className="gallery-art"><img src="/assets/npc-hood-gallery-2.webp" alt="Street NPC in a green hood with pixel glasses" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0047 / NIGHT SHIFT</span><span>02 <ArrowUpRight size={13} /></span></div></article>
-            <article className="gallery-card gallery-card-three"><div className="gallery-art"><img src="/assets/npc-hood-gallery-3.webp" alt="Explorer in a green hood with a gold-trimmed mask" loading="lazy" /></div><div className="gallery-meta"><span>FILE 1028 / GOLDEN HOUR</span><span>03 <ArrowUpRight size={13} /></span></div></article>
+            <article className="gallery-card gallery-card-one"><div className="gallery-art"><img src={`${FALLBACK_IMAGE_BASE}2.png`} alt="NPC HOOD #0002, a Pathfinder in a green hood" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0002 / PATHFINDER</span><span>01 <ArrowUpRight size={13} /></span></div></article>
+            <article className="gallery-card gallery-card-two"><div className="gallery-art"><img src={`${FALLBACK_IMAGE_BASE}47.png`} alt="NPC HOOD #0047, a Quiet Watcher in a green hood" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0047 / QUIET WATCHER</span><span>02 <ArrowUpRight size={13} /></span></div></article>
+            <article className="gallery-card gallery-card-three"><div className="gallery-art"><img src={`${FALLBACK_IMAGE_BASE}1028.png`} alt="NPC HOOD #1028, a Wayfinder in a green hood" loading="lazy" /></div><div className="gallery-meta"><span>FILE 1028 / WAYFINDER</span><span>03 <ArrowUpRight size={13} /></span></div></article>
           </div>
         </section>
 

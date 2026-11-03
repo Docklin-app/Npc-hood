@@ -6,15 +6,12 @@ import {
   ArrowUpRight,
   Check,
   ChevronDown,
-  CircleHelp,
-  Compass,
   ExternalLink,
   Layers3,
   Menu,
   Minus,
   Plus,
   ShieldCheck,
-  Sparkles,
   Wallet,
   X,
 } from "lucide-react";
@@ -279,7 +276,6 @@ export default function Home() {
 
   return (
     <div className="site-shell" id="top">
-      <div className="topline"><span className="topline-signal" /> ON-CHAIN COLLECTIBLES <span className="topline-divider">/</span> A HOODED LITTLE UNIVERSE</div>
       <header className="site-header">
         <a href="#top" className="brand" aria-label="NPC HOOD home">
           <PixelMark />
@@ -308,30 +304,22 @@ export default function Home() {
       <main>
         <section className="hero-section" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <div className="eyebrow"><span className="eyebrow-star">✳</span> COLLECTION NO. 001 <span className="eyebrow-line" /></div>
             <h1 id="hero-title">EVERY TOWN<br /><span>HAS ITS</span> <em>HOOD.</em></h1>
             <p className="hero-lede">Karakter kecil. Cerita besar. Temui para NPC berjubah yang menjaga sudut-sudut kota pixel kami.</p>
             <div className="hero-facts">
               <div><span className="fact-number">10K</span><span className="fact-label">TOTAL SUPPLY</span></div>
-              <div><span className="fact-number">16×16</span><span className="fact-label">PIXEL ROOTS</span></div>
-              <div><span className="fact-number">1</span><span className="fact-label">SHARED WORLD</span></div>
             </div>
             <div className="hero-ctas">
               <a href="#mint" className="button-primary">JELAJAHI MINT <ArrowDown size={16} /></a>
               <a href="#collection" className="button-text">LIHAT KOLEKSI <ArrowRight size={15} /></a>
             </div>
-            <div className="hero-footnote"><ShieldCheck size={14} /> Transaksi hanya lewat wallet Anda. Kami tidak meminta seed phrase.</div>
           </div>
 
           <div className="hero-art-wrap">
-            <div className="art-index"><span>NPC HOOD / 001</span><span>THE FIRST LOOK</span></div>
             <div className="hero-art-frame">
               <img src={HERO_IMAGE} alt="Karakter pixel-art berjubah hijau, memakai topi hijau, di kota saat senja" className="hero-art" />
               <div className="art-corner art-corner-tl" /><div className="art-corner art-corner-br" />
-              <div className="art-stamp"><span>THE</span><strong>HOOD<br />KNOWS</strong><span>YOUR NAME</span></div>
             </div>
-            <div className="art-caption"><span><i className="caption-dot" /> CHARACTER FILE / 0001</span><span>GREEN KEEPER <ArrowUpRight size={12} /></span></div>
-            <div className="floating-note"><Sparkles size={14} /> PIXEL-BORN<br /><b>HOOD-BOUND</b></div>
           </div>
         </section>
 
@@ -340,7 +328,6 @@ export default function Home() {
             <div className="section-kicker">YOUR NEXT CHARACTER <span>↘</span></div>
             <h2 id="mint-title">Pick your<br /><em>hood.</em></h2>
             <p>Setiap mint jadi bagian dari cerita. Pilih jalurmu dan konfirmasi langsung di wallet.</p>
-            <div className="mint-note"><span className="note-icon"><CircleHelp size={16} /></span><span>Biaya jaringan dan fee proyek tampil terpisah di wallet sebelum Anda menyetujui transaksi.</span></div>
           </div>
 
           <div className="mint-card">
@@ -383,7 +370,6 @@ export default function Home() {
             {notice && <div className={`tx-message ${txState}`} role="status" aria-live="polite">{txState === "success" && <Check size={15} />}{notice}{txHash && <a href={EXPLORER_URL ? `${EXPLORER_URL}/tx/${txHash}` : undefined} target="_blank" rel="noreferrer" className={EXPLORER_URL ? "tx-link" : "tx-hash"}>{EXPLORER_URL ? <> VIEW TX <ExternalLink size={12} /></> : shortAddress(txHash)}</a>}</div>}
             <p className="mint-disclaimer"><ShieldCheck size={12} /> Review network, amount, and gas in your wallet. Never share your recovery phrase.</p>
           </div>
-          <div className="mint-side-label">MINT DIRECTLY<br />FROM THE SOURCE <ArrowDown size={14} /></div>
         </section>
 
         <AgentMintPromptBuilder
@@ -397,33 +383,21 @@ export default function Home() {
           quantity={quantity}
         />
 
-        <section className="steps-section" aria-label="Cara mint">
-          <div className="steps-heading"><span className="section-kicker">THREE SMALL STEPS</span><span>THE REST IS YOUR STORY.</span></div>
-          <div className="steps-grid">
-            <article className="step-card"><span className="step-number">01</span><div><h3>CONNECT</h3><p>Sambungkan wallet EVM yang ingin Anda pakai.</p></div><Wallet size={19} /></article>
-            <article className="step-card"><span className="step-number">02</span><div><h3>PICK A ROUTE</h3><p>Pilih Free Mint atau Paid Mint, lalu tentukan jumlah.</p></div><Compass size={19} /></article>
-            <article className="step-card"><span className="step-number">03</span><div><h3>MAKE IT YOURS</h3><p>Periksa rincian. Setujui transaksi di wallet Anda.</p></div><Sparkles size={19} /></article>
-          </div>
-        </section>
 
         <section className="collection-section" id="collection">
           <div className="collection-heading">
-            <div><span className="section-kicker">FIELD NOTES / 001—003</span><h2>NFT<br /><em>Gallery</em></h2></div>
             <p>Mereka mungkin NPC di dunia lain.<br />Di sini, setiap karakter punya tempat.</p>
-            <span className="collection-arrow">↓  SCROLL THE FILES</span>
           </div>
           <div className="gallery-grid">
             <article className="gallery-card gallery-card-one"><div className="gallery-art"><img src="/assets/npc-hood-gallery-1.webp" alt="Penjaga hutan dengan jubah hijau gelap" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0002 / THE WATCHER</span><span>01 <ArrowUpRight size={13} /></span></div></article>
             <article className="gallery-card gallery-card-two"><div className="gallery-art"><img src="/assets/npc-hood-gallery-2.webp" alt="NPC jalanan berjubah hijau dengan kacamata pixel" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0047 / NIGHT SHIFT</span><span>02 <ArrowUpRight size={13} /></span></div></article>
             <article className="gallery-card gallery-card-three"><div className="gallery-art"><img src="/assets/npc-hood-gallery-3.webp" alt="Penjelajah bertudung hijau dengan topeng bertrim emas" loading="lazy" /></div><div className="gallery-meta"><span>FILE 1028 / GOLDEN HOUR</span><span>03 <ArrowUpRight size={13} /></span></div></article>
           </div>
-          <div className="gallery-tail"><span>10,000 CHARACTERS / ONE SHARED CITY</span><span>MORE FILES TO BE FOUND <span className="tail-cross">✳</span></span></div>
         </section>
 
         <section className="lore-section" id="lore">
           <div className="lore-ornament"><PixelMark /><span>THE HOOD CHRONICLES</span></div>
           <div className="lore-copy"><span className="section-kicker">A NOTE FROM THE ALLEY</span><h2>Not the hero.<br /><em>Still the story.</em></h2><p>Di sela lampu kota, ada yang berjaga ketika yang lain lewat. NPC HOOD merayakan karakter yang biasanya cuma jadi latar—pixel demi pixel, jubah demi jubah.</p><a href="#mint" className="lore-link">TEMUKAN SATU <ArrowUpRight size={15} /></a></div>
-          <div className="lore-side"><span className="lore-star">✳</span><p>“The quietest<br />character may<br />know the whole town.”</p><span className="lore-caption">— NOTES FROM THE HOOD</span></div>
         </section>
 
         <section className="faq-section" id="faq">
@@ -432,8 +406,7 @@ export default function Home() {
             {[
               { q: "Apa bedanya Free Mint dan Paid Mint?", a: "Free Mint dikenai fee proyek sebesar 0.0001 native currency per NFT. Paid Mint dikenai 0.0003 native currency per NFT. Gas jaringan ditampilkan terpisah oleh wallet Anda sebelum transaksi disetujui." },
               { q: "Ke mana fee mint dikirim?", a: "Pembayaran masuk ke saldo smart contract NPC HOOD. Pemilik kontrak dapat menarik saldo melalui fungsi withdraw(). Alamat owner mengikuti wallet yang men-deploy kontrak." },
-              { q: "Jaringan apa yang dipakai?", a: "Chain ditetapkan oleh pemilik koleksi saat deploy. Sebelum chain ID dan alamat kontrak dikonfigurasi pada situs, mint live tetap dinonaktifkan dan tidak ada jaringan yang diasumsikan." },
-              { q: "Apakah Anda pernah meminta seed phrase?", a: "Tidak. Jangan pernah membagikan seed phrase atau private key kepada siapa pun. Tinjau alamat kontrak, jaringan, harga, dan gas langsung di wallet sebelum menandatangani." },
+              { q: "Jaringan apa yang dipakai?", a: "NPC HOOD berjalan di BNB Smart Chain (chain ID 56). Pastikan wallet Anda berada di jaringan itu sebelum mint — situs akan menawarkan perpindahan jaringan bila wallet Anda masih di jaringan lain." },
             ].map((item, index) => (
               <article className={faqOpen === index ? "faq-item open" : "faq-item"} key={item.q}>
                 <button onClick={() => setFaqOpen(faqOpen === index ? null : index)} aria-expanded={faqOpen === index}><span>{String(index + 1).padStart(2, "0")}</span><strong>{item.q}</strong><Plus size={17} /></button>
@@ -443,10 +416,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="final-cta"><span className="final-spark">✳</span><div><span className="section-kicker">YOUR PLACE IS WAITING</span><h2>Find your<br /><em>hood.</em></h2></div><a href="#mint" className="button-primary">GO TO MINT <ArrowUpRight size={17} /></a><span className="final-code">NPC HOOD<br />EST. PIXEL ERA</span></section>
       </main>
 
-      <footer className="site-footer"><a href="#top" className="footer-brand"><PixelMark /> NPC HOOD</a><span>BUILT ONE PIXEL AT A TIME <span className="footer-dot">✳</span></span><a href="#top" className="back-top">BACK TO TOP ↑</a></footer>
     </div>
   );
 }

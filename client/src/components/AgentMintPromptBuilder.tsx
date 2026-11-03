@@ -263,10 +263,9 @@ export default function AgentMintPromptBuilder({
           <ShieldCheck size={15} />
           <p>
             Ini hanya pembuat dan penyalin prompt—bukan koneksi API resmi
-            Binance. Situs tidak menandatangani atau mengirim transaksi. Jangan
-            pernah memberikan seed phrase/private key; periksa jaringan,
-            kontrak, jumlah, gas, dan total di wallet sebelum menyetujui
-            transaksi.
+            Binance. Situs tidak menandatangani atau mengirim transaksi. Periksa
+            jaringan, kontrak, jumlah, gas, dan total di wallet sebelum
+            menyetujui transaksi.
           </p>
         </div>
         {status && (

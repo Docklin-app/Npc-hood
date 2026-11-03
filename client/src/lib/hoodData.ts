@@ -124,6 +124,164 @@ export type TokenMeta = {
   image: string;
 };
 
+// --- Mint-route scan (PATRON badges) ---------------------------------------
+// The contract does not record whether a token came from freeMint or
+// paidMint, so the badge data is rebuilt from mint Transfer logs: each
+// mint transaction's input selector says which route it took. The scan is
+// best-effort — it caches per-token routes plus a block watermark in
+// localStorage, walks forward on every visit, and only walks backwards
+// (bounded) until every minted token has a known route. Any RPC failure
+// simply resolves with whatever is already known; badges never break the
+// board.
+
+export type MintRouteScan = {
+  paidWallets: string[];
+};
+
+type RouteEntry = { r: "f" | "p"; to: string };
+type RoutesCache = { routes: Record<string, RouteEntry>; fromBlock: number; toBlock: number };
+
+const ROUTES_PREFIX = "npchood:routes:v1:";
+const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+const ZERO_TOPIC = `0x${"0".repeat(64)}`;
+// freeMint(uint256) is 0x7c928fe9; anything that is not paidMint counts as free.
+const PAID_MINT_SELECTOR = "0x65cde733";
+const LOG_CHUNK = 10000;
+const MAX_BACK_CHUNKS = 24;
+const routesInflight = new Map<string, Promise<MintRouteScan>>();
+
+function readRoutesCache(contractAddress: string): RoutesCache | null {
+  try {
+    const raw = window.localStorage.getItem(ROUTES_PREFIX + contractAddress);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { routes?: unknown; fromBlock?: unknown; toBlock?: unknown };
+    if (typeof parsed.fromBlock !== "number" || typeof parsed.toBlock !== "number") return null;
+    if (!parsed.routes || typeof parsed.routes !== "object") return null;
+    return {
+      routes: parsed.routes as Record<string, RouteEntry>,
+      fromBlock: parsed.fromBlock,
+      toBlock: parsed.toBlock,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeRoutesCache(contractAddress: string, cache: RoutesCache) {
+  try {
+    window.localStorage.setItem(ROUTES_PREFIX + contractAddress, JSON.stringify(cache));
+  } catch {
+    // Cache is an optimisation only.
+  }
+}
+
+async function connectProvider(): Promise<JsonRpcProvider | null> {
+  for (const url of RPC_URLS) {
+    try {
+      const provider = new JsonRpcProvider(url);
+      await provider.getBlockNumber();
+      return provider;
+    } catch {
+      // Try the next public RPC endpoint.
+    }
+  }
+  return null;
+}
+
+async function runRouteScan(contractAddress: string): Promise<MintRouteScan> {
+  const empty: MintRouteScan = { paidWallets: [] };
+  try {
+    const needed = await readTotalMinted(contractAddress);
+    if (!needed) return empty;
+    const provider = await connectProvider();
+    if (!provider) return empty;
+    const head = await provider.getBlockNumber();
+    const cached = readRoutesCache(contractAddress);
+    const cache: RoutesCache = cached ?? { routes: {}, fromBlock: head + 1, toBlock: head };
+    const txRoutes = new Map<string, "f" | "p">();
+
+    const scanRange = async (fromBlock: number, toBlock: number) => {
+      const logs = await provider.getLogs({
+        address: contractAddress,
+        topics: [TRANSFER_TOPIC, ZERO_TOPIC],
+        fromBlock,
+        toBlock,
+      });
+      const byTx = new Map<string, { id: number; to: string }[]>();
+      for (const log of logs) {
+        const topicId = log.topics[3];
+        const topicTo = log.topics[2];
+        if (!topicId || !topicTo) continue;
+        const id = Number(BigInt(topicId));
+        const to = `0x${topicTo.slice(-40)}`.toLowerCase();
+        const list = byTx.get(log.transactionHash) ?? [];
+        list.push({ id, to });
+        byTx.set(log.transactionHash, list);
+      }
+      for (const [hash, tokens] of byTx) {
+        let route = txRoutes.get(hash);
+        if (!route) {
+          const tx = await provider.getTransaction(hash);
+          const selector = tx ? tx.data.slice(0, 10) : "";
+          route = selector === PAID_MINT_SELECTOR ? "p" : "f";
+          txRoutes.set(hash, route);
+        }
+        for (const token of tokens) {
+          cache.routes[String(token.id)] = { r: route, to: token.to };
+        }
+      }
+    };
+
+    // Forward pass: everything after the cached watermark.
+    let cursor = cache.toBlock + 1;
+    while (cursor <= head) {
+      const end = Math.min(head, cursor + LOG_CHUNK - 1);
+      try {
+        await scanRange(cursor, end);
+        cache.toBlock = end;
+        if (cache.fromBlock > cursor) cache.fromBlock = cursor;
+        writeRoutesCache(contractAddress, cache);
+      } catch {
+        break;
+      }
+      cursor = end + 1;
+    }
+
+    // Backward pass: only while minted tokens still lack a route.
+    let backChunks = 0;
+    while (Object.keys(cache.routes).length < needed && cache.fromBlock > 0 && backChunks < MAX_BACK_CHUNKS) {
+      const end = cache.fromBlock - 1;
+      const start = Math.max(0, end - LOG_CHUNK + 1);
+      try {
+        await scanRange(start, end);
+        cache.fromBlock = start;
+        writeRoutesCache(contractAddress, cache);
+      } catch {
+        break;
+      }
+      backChunks += 1;
+    }
+
+    const paid = new Set<string>();
+    for (const entry of Object.values(cache.routes)) {
+      if (entry.r === "p") paid.add(entry.to);
+    }
+    return { paidWallets: [...paid] };
+  } catch {
+    return empty;
+  }
+}
+
+export function scanMintRoutes(contractAddress: string): Promise<MintRouteScan> {
+  const existing = routesInflight.get(contractAddress);
+  if (existing) return existing;
+  const promise = runRouteScan(contractAddress).finally(() => {
+    routesInflight.delete(contractAddress);
+  });
+  routesInflight.set(contractAddress, promise);
+  return promise;
+}
+
 const metaCache = new Map<number, TokenMeta>();
 
 export async function fetchTokenMeta(contractAddress: string, id: number): Promise<TokenMeta> {

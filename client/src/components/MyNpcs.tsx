@@ -5,6 +5,7 @@ import {
   loadRarity,
   padTokenId,
   rarityForToken,
+  scanMintRoutes,
   scanOwners,
   shortAddress,
   type RarityData,
@@ -49,6 +50,7 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
     leaderCount: number;
     leaderAddress: string;
     holders: number;
+    patron: boolean;
   } | null>(null);
   const runRef = useRef(0);
 
@@ -61,11 +63,12 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
       setScanning(true);
       setProgress(null);
       try {
-        const [scan, rarity] = await Promise.all([
+        const [scan, rarity, routeScan] = await Promise.all([
           scanOwners(contractAddress, (done, total) => {
             if (runRef.current === run) setProgress({ done, total });
           }),
           loadRarity().catch((): RarityData | null => null),
+          scanMintRoutes(contractAddress).catch(() => null),
         ]);
         if (runRef.current !== run) return;
         const wanted = address.toLowerCase();
@@ -77,8 +80,14 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
         for (const owner of scan.owners) {
           if (owner) holderCounts.set(owner, (holderCounts.get(owner) ?? 0) + 1);
         }
-        let raceInfo: { rank: number; count: number; leaderCount: number; leaderAddress: string; holders: number } | null =
-          null;
+        let raceInfo: {
+          rank: number;
+          count: number;
+          leaderCount: number;
+          leaderAddress: string;
+          holders: number;
+          patron: boolean;
+        } | null = null;
         if (holderCounts.size > 0) {
           const leaderEntry = [...holderCounts.entries()].sort(
             (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
@@ -90,6 +99,7 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
             leaderCount: leaderEntry[1],
             leaderAddress: leaderEntry[0],
             holders: holderCounts.size,
+            patron: routeScan ? routeScan.paidWallets.includes(wanted) : false,
           };
         }
         const owned: OwnedToken[] = [];
@@ -257,6 +267,7 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
                     {shortAddress(race.leaderAddress)}.
                   </>
                 )}
+                {race.patron && <span className="patron-badge">PATRON</span>}
               </p>
               <div className="hood-actions">
                 <button className="share-button" onClick={() => void shareRank()} disabled={sharingRank}>

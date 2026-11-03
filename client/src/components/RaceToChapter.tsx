@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Crown } from "lucide-react";
-import { scanOwners, shortAddress } from "@/lib/hoodData";
+import { scanMintRoutes, scanOwners, shortAddress } from "@/lib/hoodData";
 
 type RaceToChapterProps = {
   contractAddress: string;
@@ -28,6 +28,7 @@ type Contender = { address: string; count: number };
 
 export default function RaceToChapter({ contractAddress, explorerUrl, configured, refreshSignal }: RaceToChapterProps) {
   const [total, setTotal] = useState<number | null>(null);
+  const [paidWallets, setPaidWallets] = useState<string[]>([]);
   const [contenders, setContenders] = useState<Contender[] | null>(null);
   const [founders, setFounders] = useState<Record<string, FounderRecord>>({});
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -68,6 +69,19 @@ export default function RaceToChapter({ contractAddress, explorerUrl, configured
   useEffect(() => {
     void load();
   }, [load, refreshSignal]);
+
+  useEffect(() => {
+    if (!configured || !contractAddress) return;
+    let cancelled = false;
+    scanMintRoutes(contractAddress)
+      .then((scan) => {
+        if (!cancelled) setPaidWallets(scan.paidWallets);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [configured, contractAddress, refreshSignal]);
 
   if (!configured) return null;
 
@@ -142,6 +156,7 @@ export default function RaceToChapter({ contractAddress, explorerUrl, configured
                   </span>
                   <a href={`${explorerUrl}/address/${row.address}`} target="_blank" rel="noreferrer" className="board-address">
                     {shortAddress(row.address)} <ArrowUpRight size={12} />
+                    {paidWallets.includes(row.address) && <span className="patron-badge">PATRON</span>}
                   </a>
                   <span className="board-bar" aria-hidden="true">
                     <span style={{ width: `${leaderCount > 0 ? (row.count / leaderCount) * 100 : 0}%` }} />

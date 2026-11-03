@@ -424,6 +424,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
 .board-count { color: var(--pine-deep); font-size: 12px; text-align: right; }
 .board-count small { color: var(--muted); font: 9px var(--mono); }
 .board-count .board-gap { display: block; margin-top: 3px; color: #b88930; letter-spacing: .06em; }
+.patron-badge { display: inline-flex; align-items: center; margin-left: 8px; padding: 2px 7px; background: var(--gold); color: var(--pine-deep); font: 8px var(--mono); letter-spacing: .12em; vertical-align: 2px; white-space: nowrap; }
 .board-crown-line { margin: 22px 0 -6px; color: var(--pine); font: 11px var(--mono); letter-spacing: .05em; line-height: 1.8; }
 .rank-banner { margin-top: 18px; padding: 16px 18px; background: #fdf3d7; border: 1px solid var(--gold); color: var(--pine-deep); }
 .rank-banner p { margin: 0; font-size: 12.5px; line-height: 1.8; }

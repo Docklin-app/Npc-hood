@@ -58,10 +58,10 @@ function getErrorMessage(error: unknown) {
   }
   if (error && typeof error === "object" && "message" in error) {
     const message = String((error as { message: string }).message);
-    if (message.toLowerCase().includes("user rejected")) return "Tanda tangan dibatalkan di wallet.";
+    if (message.toLowerCase().includes("user rejected")) return "Signature cancelled in the wallet.";
     return message;
   }
-  return "Transaksi gagal. Periksa wallet dan coba lagi.";
+  return "Transaction failed. Check your wallet and try again.";
 }
 
 function PixelMark() {
@@ -117,12 +117,12 @@ export default function Home() {
       } else {
         setContractVerified(false);
         setMintOpen(false);
-        setContractWarning("Kontrak tidak cocok dengan supply, batas transaksi, atau harga NPC HOOD.");
+        setContractWarning("The contract does not match NPC HOOD's supply, per-transaction limit, or prices.");
       }
     } catch (error) {
       setContractVerified(false);
       setMintOpen(false);
-      setContractWarning("Kontrak belum dapat diverifikasi di jaringan ini. Periksa chain ID dan alamat kontrak.");
+      setContractWarning("The contract could not be verified on this network. Check the chain ID and contract address.");
       console.warn("Could not read NPC HOOD contract state", error);
     }
   }, []);
@@ -165,7 +165,7 @@ export default function Home() {
   const connectWallet = async () => {
     setNotice("");
     if (!window.ethereum) {
-      setNotice("Wallet Web3 tidak ditemukan. Buka halaman ini dari browser yang memiliki wallet EVM.");
+      setNotice("No Web3 wallet found. Open this page in a browser with an EVM wallet.");
       return;
     }
     try {
@@ -187,13 +187,13 @@ export default function Home() {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: `0x${CHAIN_ID.toString(16)}` }],
       });
-      setNotice("Permintaan pergantian jaringan dikirim ke wallet.");
+      setNotice("Network switch request sent to your wallet.");
     } catch (error) {
       const code = error && typeof error === "object" && "code" in error ? Number((error as { code: unknown }).code) : 0;
       const manualStep = code === 4902
-        ? `Jaringan ${CHAIN_NAME} belum dikenal wallet. Tambahkan manual dengan chain ID dan RPC resmi jaringan, lalu coba lagi.`
-        : `Pilih ${CHAIN_NAME} di wallet sebelum mint.`;
-      setNotice(`Tidak dapat mengganti jaringan otomatis. ${manualStep} ${getErrorMessage(error)}`);
+        ? `The ${CHAIN_NAME} network is not known to your wallet. Add it manually with the chain ID and the network's official RPC, then try again.`
+        : `Select ${CHAIN_NAME} in your wallet before minting.`;
+      setNotice(`Could not switch the network automatically. ${manualStep} ${getErrorMessage(error)}`);
     }
   };
 
@@ -201,12 +201,12 @@ export default function Home() {
     setNotice("");
     setTxHash(null);
     if (!hasConfig) {
-      setNotice("Mint belum aktif: alamat kontrak dan chain ID belum dikonfigurasi.");
+      setNotice("Mint is not active yet: the contract address and chain ID are not configured.");
       setTxState("error");
       return;
     }
     if (!window.ethereum) {
-      setNotice("Hubungkan wallet EVM terlebih dahulu.");
+      setNotice("Connect an EVM wallet first.");
       setTxState("error");
       return;
     }
@@ -220,16 +220,16 @@ export default function Home() {
     }
     if (!contractVerified) {
       setTxState("error");
-      setNotice(contractWarning || "Kontrak harus terverifikasi sebelum transaksi dapat dikirim.");
+      setNotice(contractWarning || "The contract must be verified before a transaction can be sent.");
       return;
     }
     if (!mintOpen) {
       setTxState("error");
-      setNotice("Mint masih ditutup. Tunggu sampai owner kontrak membukanya.");
+      setNotice("Mint is still closed. Wait until the contract owner opens it.");
       return;
     }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_PER_TX || (remaining !== null && quantity > remaining)) {
-      setNotice("Jumlah mint tidak valid atau melebihi sisa supply.");
+      setNotice("Invalid mint quantity, or it exceeds the remaining supply.");
       setTxState("error");
       return;
     }
@@ -241,7 +241,7 @@ export default function Home() {
         if (!Number.isSafeInteger(activeChainId) || activeChainId !== CHAIN_ID) {
           setContractVerified(false);
           setMinted(null);
-          throw new Error(`Wallet berpindah jaringan; mint dibatalkan karena targetnya ${CHAIN_NAME}.`);
+          throw new Error(`Your wallet switched networks; the mint was cancelled because the target is ${CHAIN_NAME}.`);
         }
       };
       await assertTargetChain();
@@ -250,7 +250,7 @@ export default function Home() {
       if (Number(providerNetwork.chainId) !== CHAIN_ID) {
         setContractVerified(false);
         setMinted(null);
-        throw new Error(`Chain provider tidak cocok dengan target ${CHAIN_NAME}. Mint dibatalkan.`);
+        throw new Error(`The provider chain does not match the ${CHAIN_NAME} target. Mint cancelled.`);
       }
       const signer = await provider.getSigner();
       await assertTargetChain();
@@ -260,10 +260,10 @@ export default function Home() {
       const transaction = await contract[method](BigInt(quantity), { value: perItem * BigInt(quantity) });
       setTxHash(transaction.hash as string);
       setTxState("pending");
-      setNotice("Transaksi dikirim. Menunggu konfirmasi jaringan.");
+      setNotice("Transaction sent. Waiting for network confirmation.");
       await transaction.wait();
       setTxState("success");
-      setNotice("Mint berhasil. Terima kasih sudah menjadi bagian dari NPC HOOD.");
+      setNotice("Mint successful. Thank you for being part of NPC HOOD.");
       await refreshSupply(provider);
     } catch (error) {
       setTxState("error");
@@ -272,7 +272,7 @@ export default function Home() {
   };
 
   const progress = minted === null ? 0 : Math.min(100, (minted / TOTAL_SUPPLY) * 100);
-  const mintLabel = !hasConfig ? "MINT BELUM AKTIF" : !account ? "HUBUNGKAN WALLET" : !onTargetNetwork ? "GANTI JARINGAN" : !contractVerified ? "VERIFIKASI KONTRAK" : !mintOpen ? "MINT BELUM DIBUKA OWNER" : txState === "signature" ? "MENUNGGU SIGNATURE" : txState === "pending" ? "TRANSAKSI PENDING" : "MINT NPC HOOD";
+  const mintLabel = !hasConfig ? "MINT NOT ACTIVE" : !account ? "CONNECT WALLET" : !onTargetNetwork ? "SWITCH NETWORK" : !contractVerified ? "VERIFYING CONTRACT" : !mintOpen ? "MINT NOT OPEN YET" : txState === "signature" ? "AWAITING SIGNATURE" : txState === "pending" ? "TRANSACTION PENDING" : "MINT NPC HOOD";
 
   return (
     <div className="site-shell" id="top">
@@ -281,21 +281,21 @@ export default function Home() {
           <PixelMark />
           <span className="brand-copy"><strong>NPC<span>HOOD</span></strong><small>PIXEL COLLECTIVE</small></span>
         </a>
-        <nav className={mobileNavOpen ? "main-nav is-open" : "main-nav"} aria-label="Navigasi utama">
-          <a href="#collection" onClick={() => setMobileNavOpen(false)}>Koleksi</a>
+        <nav className={mobileNavOpen ? "main-nav is-open" : "main-nav"} aria-label="Main navigation">
+          <a href="#collection" onClick={() => setMobileNavOpen(false)}>Collection</a>
           <a href="#mint" onClick={() => setMobileNavOpen(false)}>Mint</a>
           <a href="#agent-mint" onClick={() => setMobileNavOpen(false)}>AI Agent</a>
-          <a href="#lore" onClick={() => setMobileNavOpen(false)}>Cerita</a>
+          <a href="#lore" onClick={() => setMobileNavOpen(false)}>Story</a>
           <a href="#faq" onClick={() => setMobileNavOpen(false)}>FAQ</a>
         </nav>
         <div className="header-actions">
-          <span className={hasConfig ? "network-pill network-ready" : "network-pill"} title={hasConfig ? `Chain ID ${CHAIN_ID}` : "Chain belum dikonfigurasi"}>
+          <span className={hasConfig ? "network-pill network-ready" : "network-pill"} title={hasConfig ? `Chain ID ${CHAIN_ID}` : "Chain not configured"}>
             <span className="network-dot" /> {hasConfig ? CHAIN_NAME : "NETWORK SETUP"}
           </span>
           <button className="wallet-button" onClick={connectWallet}>
             <Wallet size={15} strokeWidth={2.2} /> {account ? shortAddress(account) : "CONNECT WALLET"}
           </button>
-          <button className="nav-toggle" aria-label={mobileNavOpen ? "Tutup menu" : "Buka menu"} onClick={() => setMobileNavOpen(!mobileNavOpen)}>
+          <button className="nav-toggle" aria-label={mobileNavOpen ? "Close menu" : "Open menu"} onClick={() => setMobileNavOpen(!mobileNavOpen)}>
             {mobileNavOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -305,19 +305,19 @@ export default function Home() {
         <section className="hero-section" aria-labelledby="hero-title">
           <div className="hero-copy">
             <h1 id="hero-title">EVERY TOWN<br /><span>HAS ITS</span> <em>HOOD.</em></h1>
-            <p className="hero-lede">Karakter kecil. Cerita besar. Temui para NPC berjubah yang menjaga sudut-sudut kota pixel kami.</p>
+            <p className="hero-lede">Small characters. Big stories. Meet the hooded NPCs who keep watch over the corners of our pixel town.</p>
             <div className="hero-facts">
               <div><span className="fact-number">10K</span><span className="fact-label">TOTAL SUPPLY</span></div>
             </div>
             <div className="hero-ctas">
-              <a href="#mint" className="button-primary">JELAJAHI MINT <ArrowDown size={16} /></a>
-              <a href="#collection" className="button-text">LIHAT KOLEKSI <ArrowRight size={15} /></a>
+              <a href="#mint" className="button-primary">EXPLORE MINT <ArrowDown size={16} /></a>
+              <a href="#collection" className="button-text">VIEW COLLECTION <ArrowRight size={15} /></a>
             </div>
           </div>
 
           <div className="hero-art-wrap">
             <div className="hero-art-frame">
-              <img src={HERO_IMAGE} alt="Karakter pixel-art berjubah hijau, memakai topi hijau, di kota saat senja" className="hero-art" />
+              <img src={HERO_IMAGE} alt="Pixel-art character in a green hood and green hat, in a town at dusk" className="hero-art" />
               <div className="art-corner art-corner-tl" /><div className="art-corner art-corner-br" />
             </div>
           </div>
@@ -327,13 +327,13 @@ export default function Home() {
           <div className="mint-intro">
             <div className="section-kicker">YOUR NEXT CHARACTER <span>↘</span></div>
             <h2 id="mint-title">Pick your<br /><em>hood.</em></h2>
-            <p>Setiap mint jadi bagian dari cerita. Pilih jalurmu dan konfirmasi langsung di wallet.</p>
+            <p>Every mint becomes part of the story. Pick your route and confirm right in your wallet.</p>
           </div>
 
           <div className="mint-card">
             <div className="mint-card-top"><span><span className="live-dot" /> MINT WINDOW</span><span className="card-code">NH / 10.000</span></div>
             <div className="mint-card-title-row"><h3>Choose your route</h3><span className="card-spark">✳</span></div>
-            <div className="mint-modes" role="tablist" aria-label="Pilih jenis mint">
+            <div className="mint-modes" role="tablist" aria-label="Choose mint type">
               <button className={mode === "free" ? "mint-mode selected" : "mint-mode"} onClick={() => setMode("free")} role="tab" aria-selected={mode === "free"}>
                 <span className="mode-head"><span>01 / FREE MINT</span><Check size={14} /></span>
                 <strong>0.0001 <small>{CURRENCY}</small></strong>
@@ -348,13 +348,13 @@ export default function Home() {
             <div className="quantity-row">
               <div><span className="quantity-label">QUANTITY</span><small>Up to {Math.min(remaining ?? MAX_PER_TX, MAX_PER_TX)} / tx</small></div>
               <div className="quantity-control">
-                <button aria-label="Kurangi jumlah" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}><Minus size={14} /></button>
+                <button aria-label="Decrease quantity" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}><Minus size={14} /></button>
                 <span>{String(quantity).padStart(2, "0")}</span>
-                <button aria-label="Tambah jumlah" onClick={() => setQuantity(Math.min(quantity + 1, remaining ?? MAX_PER_TX, MAX_PER_TX))} disabled={quantity >= Math.min(remaining ?? MAX_PER_TX, MAX_PER_TX)}><Plus size={14} /></button>
+                <button aria-label="Increase quantity" onClick={() => setQuantity(Math.min(quantity + 1, remaining ?? MAX_PER_TX, MAX_PER_TX))} disabled={quantity >= Math.min(remaining ?? MAX_PER_TX, MAX_PER_TX)}><Plus size={14} /></button>
               </div>
             </div>
             <div className="total-row"><span>TOTAL DUE <small>{quantity} × {mode === "free" ? "0.0001" : "0.0003"} {CURRENCY}</small></span><strong>{amountText} <small>{CURRENCY}</small></strong></div>
-            <div className="mint-progress" aria-label="Progress mint">
+            <div className="mint-progress" aria-label="Mint progress">
               <div className="progress-label"><span>{minted === null ? "SUPPLY CHECK" : "MINTED"}</span><strong>{minted === null ? "CONNECT TO READ" : `${minted.toLocaleString("en-US")} / 10,000`}</strong></div>
               <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
               <div className="progress-legend"><span>{remaining === null ? "On-chain count appears after connection" : `${remaining.toLocaleString("en-US")} REMAINING`}</span><Layers3 size={14} /></div>
@@ -363,10 +363,10 @@ export default function Home() {
               {txState === "signature" || txState === "pending" ? <span className="button-spinner" /> : <span className="mint-submit-mark">✳</span>}
               {mintLabel}<ArrowUpRight size={17} />
             </button>
-            {!hasConfig && <div className="config-alert"><span className="config-alert-dot" /><span><strong>CONTRACT NOT CONFIGURED</strong> — isi chain ID dan alamat kontrak sebelum mint live.</span></div>}
+            {!hasConfig && <div className="config-alert"><span className="config-alert-dot" /><span><strong>CONTRACT NOT CONFIGURED</strong> — set the chain ID and contract address before live minting.</span></div>}
             {hasConfig && contractWarning && <div className="config-alert"><span className="config-alert-dot" /><span><strong>CONTRACT CHECK</strong> — {contractWarning}</span></div>}
-            {hasConfig && contractVerified && !mintOpen && <div className="config-alert"><span className="config-alert-dot" /><span><strong>MINT DITUTUP</strong> — menunggu owner membuka mint dari kontrak.</span></div>}
-            {account && hasConfig && !onTargetNetwork && <button className="network-alert" onClick={changeNetwork}>Wallet berada di jaringan lain. Beralih ke {CHAIN_NAME}? <ChevronDown size={14} /></button>}
+            {hasConfig && contractVerified && !mintOpen && <div className="config-alert"><span className="config-alert-dot" /><span><strong>MINT CLOSED</strong> — waiting for the owner to open minting from the contract.</span></div>}
+            {account && hasConfig && !onTargetNetwork && <button className="network-alert" onClick={changeNetwork}>Your wallet is on another network. Switch to {CHAIN_NAME}? <ChevronDown size={14} /></button>}
             {notice && <div className={`tx-message ${txState}`} role="status" aria-live="polite">{txState === "success" && <Check size={15} />}{notice}{txHash && <a href={EXPLORER_URL ? `${EXPLORER_URL}/tx/${txHash}` : undefined} target="_blank" rel="noreferrer" className={EXPLORER_URL ? "tx-link" : "tx-hash"}>{EXPLORER_URL ? <> VIEW TX <ExternalLink size={12} /></> : shortAddress(txHash)}</a>}</div>}
             <p className="mint-disclaimer"><ShieldCheck size={12} /> Review network, amount, and gas in your wallet. Never share your recovery phrase.</p>
           </div>
@@ -386,27 +386,27 @@ export default function Home() {
 
         <section className="collection-section" id="collection">
           <div className="collection-heading">
-            <p>Mereka mungkin NPC di dunia lain.<br />Di sini, setiap karakter punya tempat.</p>
+            <p>They may be NPCs in another world.<br />Here, every character has a place.</p>
           </div>
           <div className="gallery-grid">
-            <article className="gallery-card gallery-card-one"><div className="gallery-art"><img src="/assets/npc-hood-gallery-1.webp" alt="Penjaga hutan dengan jubah hijau gelap" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0002 / THE WATCHER</span><span>01 <ArrowUpRight size={13} /></span></div></article>
-            <article className="gallery-card gallery-card-two"><div className="gallery-art"><img src="/assets/npc-hood-gallery-2.webp" alt="NPC jalanan berjubah hijau dengan kacamata pixel" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0047 / NIGHT SHIFT</span><span>02 <ArrowUpRight size={13} /></span></div></article>
-            <article className="gallery-card gallery-card-three"><div className="gallery-art"><img src="/assets/npc-hood-gallery-3.webp" alt="Penjelajah bertudung hijau dengan topeng bertrim emas" loading="lazy" /></div><div className="gallery-meta"><span>FILE 1028 / GOLDEN HOUR</span><span>03 <ArrowUpRight size={13} /></span></div></article>
+            <article className="gallery-card gallery-card-one"><div className="gallery-art"><img src="/assets/npc-hood-gallery-1.webp" alt="Forest keeper in a dark green hood" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0002 / THE WATCHER</span><span>01 <ArrowUpRight size={13} /></span></div></article>
+            <article className="gallery-card gallery-card-two"><div className="gallery-art"><img src="/assets/npc-hood-gallery-2.webp" alt="Street NPC in a green hood with pixel glasses" loading="lazy" /></div><div className="gallery-meta"><span>FILE 0047 / NIGHT SHIFT</span><span>02 <ArrowUpRight size={13} /></span></div></article>
+            <article className="gallery-card gallery-card-three"><div className="gallery-art"><img src="/assets/npc-hood-gallery-3.webp" alt="Explorer in a green hood with a gold-trimmed mask" loading="lazy" /></div><div className="gallery-meta"><span>FILE 1028 / GOLDEN HOUR</span><span>03 <ArrowUpRight size={13} /></span></div></article>
           </div>
         </section>
 
         <section className="lore-section" id="lore">
           <div className="lore-ornament"><PixelMark /><span>THE HOOD CHRONICLES</span></div>
-          <div className="lore-copy"><span className="section-kicker">A NOTE FROM THE ALLEY</span><h2>Not the hero.<br /><em>Still the story.</em></h2><p>Di sela lampu kota, ada yang berjaga ketika yang lain lewat. NPC HOOD merayakan karakter yang biasanya cuma jadi latar—pixel demi pixel, jubah demi jubah.</p><a href="#mint" className="lore-link">TEMUKAN SATU <ArrowUpRight size={15} /></a></div>
+          <div className="lore-copy"><span className="section-kicker">A NOTE FROM THE ALLEY</span><h2>Not the hero.<br /><em>Still the story.</em></h2><p>Between the city lights, someone keeps watch while the others pass by. NPC HOOD celebrates the characters who are usually just part of the background — pixel by pixel, hood by hood.</p><a href="#mint" className="lore-link">FIND YOURS <ArrowUpRight size={15} /></a></div>
         </section>
 
         <section className="faq-section" id="faq">
           <div className="faq-title"><span className="section-kicker">GOOD TO KNOW</span><h2>Before you<br /><em>step in.</em></h2></div>
           <div className="faq-list">
             {[
-              { q: "Apa bedanya Free Mint dan Paid Mint?", a: "Free Mint dikenai fee proyek sebesar 0.0001 native currency per NFT. Paid Mint dikenai 0.0003 native currency per NFT. Gas jaringan ditampilkan terpisah oleh wallet Anda sebelum transaksi disetujui." },
-              { q: "Ke mana fee mint dikirim?", a: "Pembayaran masuk ke saldo smart contract NPC HOOD. Pemilik kontrak dapat menarik saldo melalui fungsi withdraw(). Alamat owner mengikuti wallet yang men-deploy kontrak." },
-              { q: "Jaringan apa yang dipakai?", a: "NPC HOOD berjalan di BNB Smart Chain (chain ID 56). Pastikan wallet Anda berada di jaringan itu sebelum mint — situs akan menawarkan perpindahan jaringan bila wallet Anda masih di jaringan lain." },
+              { q: "What is the difference between Free Mint and Paid Mint?", a: "Free Mint charges a project fee of 0.0001 native currency per NFT. Paid Mint costs 0.0003 native currency per NFT. Network gas is shown separately by your wallet before you approve the transaction." },
+              { q: "Where do mint payments go?", a: "Payments go into the NPC HOOD smart contract balance. The contract owner can withdraw the balance through the withdraw() function. The owner address is the wallet that deployed the contract." },
+              { q: "Which network does NPC HOOD use?", a: "NPC HOOD runs on BNB Smart Chain (chain ID 56). Make sure your wallet is on that network before minting — the site will offer to switch networks if your wallet is still on another one." },
             ].map((item, index) => (
               <article className={faqOpen === index ? "faq-item open" : "faq-item"} key={item.q}>
                 <button onClick={() => setFaqOpen(faqOpen === index ? null : index)} aria-expanded={faqOpen === index}><span>{String(index + 1).padStart(2, "0")}</span><strong>{item.q}</strong><Plus size={17} /></button>

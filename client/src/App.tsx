@@ -10,7 +10,7 @@ import Home from "./pages/Home";
 const OwnerDeploy = lazy(() => import("./pages/OwnerDeploy"));
 
 function OwnerDeployRoute() {
-  return <Suspense fallback={<main className="owner-deploy-page" aria-live="polite">Memuat panel owner…</main>}><OwnerDeploy /></Suspense>;
+  return <Suspense fallback={<main className="owner-deploy-page" aria-live="polite">Loading the owner panel…</main>}><OwnerDeploy /></Suspense>;
 }
 
 function Router() {

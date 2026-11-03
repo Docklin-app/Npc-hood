@@ -94,9 +94,9 @@ export default function AgentMintPromptBuilder({
     safeConfiguration && mintOpen && validAddress && quantity >= 1 && quantity <= 20;
 
   const promptFor = (mode: MintMode) => {
-    if (!mintOpen) return "Mint masih ditutup oleh owner; prompt belum tersedia.";
+    if (!mintOpen) return "Mint is still closed by the owner; the prompt is not available yet.";
     if (!canCopy || chainId === null)
-      return "Prompt tersedia setelah alamat wallet, jaringan, dan kontrak terkonfigurasi dengan benar.";
+      return "The prompt becomes available once the wallet address, network, and contract are configured correctly.";
     return makePrompt({
       mode,
       quantity,
@@ -112,8 +112,8 @@ export default function AgentMintPromptBuilder({
     if (!canCopy) {
       setStatus(
         mintOpen
-          ? "Isi alamat wallet 0x yang valid dan pastikan konfigurasi chain serta kontrak sudah tersedia."
-          : "Mint masih ditutup oleh owner. Prompt akan tersedia setelah owner membuka mint."
+          ? "Enter a valid 0x wallet address and make sure the chain and contract configuration are available."
+          : "Mint is still closed by the owner. Prompts become available after the owner opens minting."
       );
       return;
     }
@@ -122,12 +122,12 @@ export default function AgentMintPromptBuilder({
       await navigator.clipboard.writeText(promptFor(mode));
       setCopiedMode(mode);
       setStatus(
-        `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt disalin. Tinjau prompt dan detail transaksi sebelum menyetujui apa pun di wallet.`
+        `${mode === "free" ? "Free Mint" : "Paid Mint"} prompt copied. Review the prompt and the transaction details before approving anything in your wallet.`
       );
     } catch {
       setCopiedMode(null);
       setStatus(
-        "Clipboard tidak tersedia. Anda dapat memilih dan menyalin teks prompt dari kartu secara manual."
+        "Clipboard is not available. You can select and copy the prompt text from the card manually."
       );
     }
   };
@@ -161,7 +161,7 @@ export default function AgentMintPromptBuilder({
           disabled={!canCopy}
         >
           {copiedMode === mode ? <Check size={15} /> : <Copy size={15} />}
-          {copiedMode === mode ? "PROMPT DISALIN" : "SALIN PROMPT"}
+          {copiedMode === mode ? "PROMPT COPIED" : "COPY PROMPT"}
         </button>
       </article>
     );
@@ -185,8 +185,8 @@ export default function AgentMintPromptBuilder({
               <em>prepare your mint.</em>
             </h2>
             <p>
-              Tempel alamat wallet Binance AI Agent, lalu salin prompt Free Mint
-              atau Paid Mint. Jumlah mengikuti pilihan di kartu mint di atas.
+              Paste the Binance AI Agent wallet address, then copy the Free Mint
+              or Paid Mint prompt. The quantity follows your choice in the mint card above.
             </p>
           </div>
           <span className="agent-safety-badge">
@@ -212,7 +212,7 @@ export default function AgentMintPromptBuilder({
               autoCapitalize="off"
               spellCheck={false}
               maxLength={42}
-              placeholder="0x… tempel alamat wallet publik"
+              placeholder="0x… paste a public wallet address"
               value={walletAddress}
               aria-invalid={Boolean(normalizedAddress) && !validAddress}
               onChange={event => {
@@ -231,14 +231,14 @@ export default function AgentMintPromptBuilder({
                   setStatus("");
                 }}
               >
-                <Wallet size={14} /> WALLET TERHUBUNG
+                <Wallet size={14} /> CONNECTED WALLET
               </button>
             )}
           </div>
           <p className="agent-wallet-hint">
             {normalizedAddress && !validAddress
-              ? "Masukkan alamat wallet EVM lengkap: 0x diikuti 40 karakter heksadesimal."
-              : "Alamat ini hanya dipakai di browser untuk menyusun teks prompt; tidak dikirim ke server."}
+              ? "Enter a complete EVM wallet address: 0x followed by 40 hexadecimal characters."
+              : "This address is only used in your browser to compose the prompt text; it is never sent to a server."}
           </p>
         </div>
 
@@ -246,10 +246,10 @@ export default function AgentMintPromptBuilder({
           <div className="agent-config-alert" role="status">
             <span aria-hidden="true">!</span>
             <p>
-              <strong>PROMPT BELUM AKTIF.</strong> Isi chain ID, nama jaringan,
-              simbol native coin, dan alamat kontrak NPC HOOD yang sudah
-              dideploy pada GitHub Actions Variables. Jangan gunakan alamat dari
-              proyek lain.
+              <strong>PROMPT NOT ACTIVE.</strong> Fill in the chain ID, network name,
+              native coin symbol, and the deployed NPC HOOD contract address in
+              the GitHub Actions Variables. Do not use an address from another
+              project.
             </p>
           </div>
         )}
@@ -262,10 +262,10 @@ export default function AgentMintPromptBuilder({
         <div className="agent-notice" role="note">
           <ShieldCheck size={15} />
           <p>
-            Ini hanya pembuat dan penyalin prompt—bukan koneksi API resmi
-            Binance. Situs tidak menandatangani atau mengirim transaksi. Periksa
-            jaringan, kontrak, jumlah, gas, dan total di wallet sebelum
-            menyetujui transaksi.
+            This is only a prompt builder and copier — not an official Binance
+            API connection. The site does not sign or send transactions. Check
+            the network, contract, quantity, gas, and total in your wallet
+            before approving a transaction.
           </p>
         </div>
         {status && (

@@ -11,7 +11,7 @@ import {
   type RarityData,
   type TokenMeta,
 } from "@/lib/hoodData";
-import { buildRankCardBlob, buildShareCardBlob, downloadBlob, rankShareText, shareOnXUrl } from "@/lib/shareCard";
+import { buildRankCardBlob, buildShareCardBlob, buildWallpaperBlob, downloadBlob, rankShareText, shareOnXUrl } from "@/lib/shareCard";
 
 type MyNpcsProps = {
   account: string | null;
@@ -44,6 +44,7 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
   const [error, setError] = useState("");
   const [sharingId, setSharingId] = useState<number | null>(null);
   const [sharingRank, setSharingRank] = useState(false);
+  const [wallpapering, setWallpapering] = useState(false);
   const [race, setRace] = useState<{
     rank: number;
     count: number;
@@ -179,6 +180,29 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
     }
   };
 
+  const makeWallpaper = async () => {
+    if (!tokens || tokens.length === 0 || !target) return;
+    setWallpapering(true);
+    try {
+      const blob = await buildWallpaperBlob({
+        address: target,
+        rank: race ? race.rank : null,
+        holders: race ? race.holders : 0,
+        count: tokens.length,
+        tokens: tokens.map((token) => ({
+          id: token.meta.id,
+          image: token.meta.image,
+          character: token.meta.character,
+        })),
+      });
+      downloadBlob(blob, `npc-hood-wallpaper-${shortAddress(target)}.png`);
+    } catch {
+      // The wallpaper is a bonus; failing silently keeps the page calm.
+    } finally {
+      setWallpapering(false);
+    }
+  };
+
   if (!configured) return null;
 
   const best = tokens && tokens.length > 0 ? tokens[0] : null;
@@ -283,6 +307,22 @@ export default function MyNpcs({ account, contractAddress, explorerUrl, configur
                   rel="noreferrer"
                 >
                   POST ON X <ArrowUpRight size={12} />
+                </a>
+                <button className="share-button" onClick={() => void makeWallpaper()} disabled={wallpapering}>
+                  <Download size={12} /> {wallpapering ? "RENDERING…" : "PHONE WALLPAPER"}
+                </button>
+                <a
+                  className="share-button"
+                  href={shareOnXUrl(
+                    race.rank === 1
+                      ? `👑 I reign as NPC HOOD's Top Minter with ${race.count} NPC${race.count > 1 ? "s" : ""}.\nThe crown falls at ${race.count + 1} — come take it.\nFree mint 0.0001 BNB · @NPChood_xyz`
+                      : `The NPC HOOD crown sits at just ${race.leaderCount} NPCs 👑\nMint ${race.leaderCount + 1} and the throne changes hands. I'm #${race.rank} with ${race.count} — race you there.\nFree mint 0.0001 BNB · @NPChood_xyz`,
+                    "https://npcshood.xyz",
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  CHALLENGE <ArrowUpRight size={12} />
                 </a>
               </div>
             </div>

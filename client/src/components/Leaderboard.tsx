@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Crown } from "lucide-react";
 import { fetchTokenMeta, scanMintRoutes, scanOwners, shortAddress } from "@/lib/hoodData";
+import { shareOnXUrl } from "@/lib/shareCard";
+import TokenDetail from "@/components/TokenDetail";
 
 type LeaderboardProps = {
   contractAddress: string;
@@ -17,11 +19,13 @@ type Row = {
 type PodiumEntry = Row & {
   image: string;
   character: string;
+  tokenId: number;
 };
 
 export default function Leaderboard({ contractAddress, explorerUrl, configured, refreshSignal }: LeaderboardProps) {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [podium, setPodium] = useState<PodiumEntry[]>([]);
+  const [detailId, setDetailId] = useState<number | null>(null);
   const [paidWallets, setPaidWallets] = useState<string[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -54,6 +58,7 @@ export default function Leaderboard({ contractAddress, explorerUrl, configured, 
           ...entry,
           image: meta?.image ?? "",
           character: meta?.character ?? "",
+          tokenId: firstId,
         });
       }
       setPodium(entries);
@@ -123,7 +128,12 @@ export default function Leaderboard({ contractAddress, explorerUrl, configured, 
           {podium.length > 0 && (
             <div className="podium">
               {podium.map((entry, i) => (
-                <article className={`podium-card rank-${i + 1}`} key={entry.address}>
+                <article
+                  className={`podium-card rank-${i + 1}`}
+                  key={entry.address}
+                  onClick={() => entry.tokenId > 0 && setDetailId(entry.tokenId)}
+                  title={entry.tokenId > 0 ? `View this holder's first NPC` : undefined}
+                >
                   <div className="podium-art">
                     {entry.image ? <img src={entry.image} alt={`NPC held by ${shortAddress(entry.address)}`} loading="lazy" /> : null}
                   </div>
@@ -175,7 +185,31 @@ export default function Leaderboard({ contractAddress, explorerUrl, configured, 
               );
             })}
           </ol>
+          <div className="board-challenge">
+            <p>
+              <strong>The throne is cheap to take.</strong> Post the challenge and let the town race for the crown.
+            </p>
+            <a
+              className="hood-load"
+              href={shareOnXUrl(
+                `👑 The NPC HOOD crown sits at just ${topCount} NPCs.\nMint ${topCount + 1} (free, 0.0001 BNB each) and the Top Minter throne changes hands.\nThink you can take it? @NPChood_xyz`,
+                "https://npcshood.xyz",
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              POST THE CHALLENGE <ArrowUpRight size={12} />
+            </a>
+          </div>
         </>
+      )}
+      {detailId !== null && (
+        <TokenDetail
+          tokenId={detailId}
+          contractAddress={contractAddress}
+          explorerUrl={explorerUrl}
+          onClose={() => setDetailId(null)}
+        />
       )}
     </section>
   );

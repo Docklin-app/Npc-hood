@@ -8,9 +8,11 @@ import {
   shortAddress,
   type RarityData,
 } from "@/lib/hoodData";
+import TokenDetail from "@/components/TokenDetail";
 
 type CollectionExplorerProps = {
   contractAddress: string;
+  explorerUrl: string;
   configured: boolean;
 };
 
@@ -19,7 +21,7 @@ type SortMode = "number" | "rarity";
 
 const PAGE = 48;
 
-export default function CollectionExplorer({ contractAddress, configured }: CollectionExplorerProps) {
+export default function CollectionExplorer({ contractAddress, explorerUrl, configured }: CollectionExplorerProps) {
   const [rarity, setRarity] = useState<RarityData | null>(null);
   const [owners, setOwners] = useState<string[] | null>(null);
   const [error, setError] = useState("");
@@ -28,6 +30,7 @@ export default function CollectionExplorer({ contractAddress, configured }: Coll
   const [status, setStatus] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortMode>("number");
   const [shown, setShown] = useState(PAGE);
+  const [detailId, setDetailId] = useState<number | null>(null);
 
   useEffect(() => {
     loadRarity()
@@ -151,7 +154,12 @@ export default function CollectionExplorer({ contractAddress, configured }: Coll
               const charValue = charIdx >= 0 ? rarity.values[charIdx]?.[rarity.tokens[id - 1]?.[charIdx] ?? 0] ?? "" : "";
               const rank = rarity.ranks[id - 1];
               return (
-                <article className={owner ? "explorer-card" : "explorer-card unminted"} key={id}>
+                <article
+                  className={owner ? "explorer-card" : "explorer-card unminted"}
+                  key={id}
+                  onClick={() => setDetailId(id)}
+                  title={`View NPC HOOD #${padTokenId(id)}`}
+                >
                   <img src={`${FALLBACK_IMAGE_BASE}${id}.png`} alt={`NPC HOOD #${padTokenId(id)}`} loading="lazy" />
                   <div className="explorer-card-body">
                     <strong>
@@ -172,6 +180,14 @@ export default function CollectionExplorer({ contractAddress, configured }: Coll
             </button>
           )}
         </>
+      )}
+      {detailId !== null && (
+        <TokenDetail
+          tokenId={detailId}
+          contractAddress={contractAddress}
+          explorerUrl={explorerUrl}
+          onClose={() => setDetailId(null)}
+        />
       )}
     </section>
   );

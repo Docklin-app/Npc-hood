@@ -2,6 +2,7 @@ import { Contract, JsonRpcProvider } from "ethers";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { NPC_HOOD_ABI } from "@/lib/npcHoodAbi";
+import TokenDetail from "@/components/TokenDetail";
 
 type RecentMintsProps = {
   contractAddress: string;
@@ -39,6 +40,7 @@ export default function RecentMints({
 }: RecentMintsProps) {
   const [total, setTotal] = useState<number | null>(null);
   const [tokens, setTokens] = useState<MintedToken[]>([]);
+  const [detailId, setDetailId] = useState<number | null>(null);
   const loadingRef = useRef(false);
 
   const load = useCallback(async () => {
@@ -159,6 +161,10 @@ export default function RecentMints({
               href={`${explorerUrl}/token/${contractAddress}?a=${token.id}`}
               target="_blank"
               rel="noreferrer"
+              onClick={(event) => {
+                event.preventDefault();
+                setDetailId(token.id);
+              }}
             >
               <div className="recent-card-top">
                 <span>NPC HOOD</span>
@@ -176,6 +182,14 @@ export default function RecentMints({
             </a>
           ))}
         </div>
+      )}
+      {detailId !== null && (
+        <TokenDetail
+          tokenId={detailId}
+          contractAddress={contractAddress}
+          explorerUrl={explorerUrl}
+          onClose={() => setDetailId(null)}
+        />
       )}
     </section>
   );

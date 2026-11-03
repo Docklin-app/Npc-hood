@@ -183,6 +183,92 @@ export async function buildRankCardBlob(input: RankCardInput): Promise<Blob> {
   });
 }
 
+export type WallpaperInput = {
+  address: string;
+  rank: number | null;
+  holders: number;
+  count: number;
+  tokens: { id: number; image: string; character: string }[];
+};
+
+export async function buildWallpaperBlob(input: WallpaperInput): Promise<Blob> {
+  const W = 1080;
+  const H = 1920;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas is not available in this browser.");
+
+  ctx.fillStyle = "#0c271b";
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "rgba(244, 241, 232, 0.05)";
+  for (let x = 30; x < W; x += 40) {
+    for (let y = 36; y < H; y += 40) {
+      ctx.fillRect(x, y, 4, 4);
+    }
+  }
+  ctx.fillStyle = "#e4b848";
+  ctx.fillRect(0, 0, W, 14);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#e4b848";
+  ctx.font = "500 40px 'DM Mono', monospace";
+  ctx.fillText("N P C   H O O D", W / 2, 190);
+  ctx.fillStyle = "#f4f1e8";
+  ctx.font = "700 130px 'Space Grotesk', sans-serif";
+  ctx.fillText("MY HOOD", W / 2, 340);
+  ctx.fillStyle = "rgba(244, 241, 232, 0.75)";
+  ctx.font = "500 38px 'DM Mono', monospace";
+  const rankLine =
+    input.rank !== null
+      ? `RANK #${input.rank} OF ${input.holders} HOLDERS · ${input.count} NPC${input.count > 1 ? "S" : ""}`
+      : `${input.count} NPC${input.count > 1 ? "S" : ""} IN THE HOOD`;
+  ctx.fillText(rankLine.slice(0, 44), W / 2, 420);
+
+  // Up to nine rarest NPCs in a 3x3 grid with gold frames.
+  const shown = input.tokens.slice(0, 9);
+  const cell = 296;
+  const gap = 26;
+  const gridW = cell * 3 + gap * 2;
+  const startX = (W - gridW) / 2;
+  const startY = 520;
+  for (let i = 0; i < shown.length; i++) {
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    const x = startX + col * (cell + gap);
+    const y = startY + row * (cell + gap);
+    ctx.fillStyle = "#e4b848";
+    ctx.fillRect(x - 5, y - 5, cell + 10, cell + 10);
+    ctx.fillStyle = "#163c2a";
+    ctx.fillRect(x, y, cell, cell);
+    try {
+      const art = await loadImage(shown[i].image);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(art, x, y, cell, cell);
+    } catch {
+      ctx.fillStyle = "#f4f1e8";
+      ctx.font = "700 44px 'Space Grotesk', sans-serif";
+      ctx.fillText(`#${padTokenId(shown[i].id)}`, x + cell / 2, y + cell / 2 + 14);
+    }
+  }
+
+  ctx.fillStyle = "#e4b848";
+  ctx.font = "500 36px 'DM Mono', monospace";
+  ctx.fillText(shortAddress(input.address), W / 2, H - 190);
+  ctx.fillStyle = "rgba(244, 241, 232, 0.65)";
+  ctx.font = "500 32px 'DM Mono', monospace";
+  ctx.fillText("npcshood.xyz · @NPChood_xyz", W / 2, H - 120);
+  ctx.textAlign = "left";
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Could not render the wallpaper."));
+    }, "image/png");
+  });
+}
+
 export function rankShareText(input: { rank: number; count: number; gap: number; isLeader: boolean }) {
   if (input.isLeader) {
     return `I'm the reigning Top Minter on NPC HOOD with ${input.count} NPC${input.count > 1 ? "s" : ""} 👑\nThink you can take the crown?\n@NPChood_xyz`;

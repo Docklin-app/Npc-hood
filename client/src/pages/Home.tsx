@@ -23,6 +23,7 @@ import MyNpcs from "@/components/MyNpcs";
 import Leaderboard from "@/components/Leaderboard";
 import RaceToChapter from "@/components/RaceToChapter";
 import CollectionExplorer from "@/components/CollectionExplorer";
+import LiveTicker from "@/components/LiveTicker";
 import { FALLBACK_IMAGE_BASE, fetchTokenMeta, padTokenId, readTokenOwner, readTotalMinted } from "@/lib/hoodData";
 import TownAwakening from "@/components/TownAwakening";
 
@@ -382,6 +383,8 @@ export default function Home() {
         </div>
       </header>
 
+      <LiveTicker contractAddress={CONTRACT_ADDRESS} configured={hasConfig} refreshSignal={minted} />
+
       {notice && txState === "idle" && (
         <div className="wallet-banner" role="status" aria-live="polite">{notice}</div>
       )}
@@ -427,6 +430,10 @@ export default function Home() {
             <p className="hero-lede">Small characters. Big stories. Meet the hooded NPCs who keep watch over the corners of our pixel town.</p>
             <div className="hero-facts">
               <div><span className="fact-number">10K</span><span className="fact-label">TOTAL SUPPLY</span></div>
+              <div>
+                <span className="fact-number"><span className="live-dot" /> {minted === null ? "—" : minted.toLocaleString("en-US")}</span>
+                <span className="fact-label">MINTED SO FAR · LIVE</span>
+              </div>
             </div>
             <div className="hero-ctas">
               <a href="#mint" className="button-primary">EXPLORE MINT <ArrowDown size={16} /></a>
@@ -564,7 +571,7 @@ export default function Home() {
           refreshSignal={minted}
         />
 
-        <CollectionExplorer contractAddress={CONTRACT_ADDRESS} configured={hasConfig} />
+        <CollectionExplorer contractAddress={CONTRACT_ADDRESS} explorerUrl={EXPLORER_URL} configured={hasConfig} />
 
         <section className="lore-section" id="lore">
           <div className="lore-ornament"><PixelMark /><span>THE HOOD CHRONICLES</span></div>

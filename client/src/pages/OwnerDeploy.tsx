@@ -1,6 +1,6 @@
 import { BrowserProvider, Contract, ContractFactory, formatEther, isAddress, parseEther, type InterfaceAbi, type Log, type LogDescription } from "ethers";
 import { useState } from "react";
-import { ArrowLeft, ArrowUpRight, Check, ExternalLink, ShieldCheck, Wallet } from "lucide-react";
+import { ArrowDownToLine, ArrowLeft, ArrowUpRight, Check, ExternalLink, ShieldCheck, Wallet } from "lucide-react";
 import { NPC_HOOD_ABI } from "@/lib/npcHoodAbi";
 import { NPC_HOOD_DEPLOY_ARTIFACT } from "@/lib/npcHoodDeployArtifact";
 
@@ -19,6 +19,7 @@ type ContractStatus = {
   maxPerTx: string;
   freeFee: string;
   paidPrice: string;
+  balance: string;
 };
 
 const NETWORKS: Network[] = [
@@ -112,9 +113,9 @@ export default function OwnerDeploy() {
     if (Number(chain.chainId) !== selectedChainId) throw new Error(`Your wallet must be on ${network.name} (Chain ID ${selectedChainId}).`);
     if (await provider.getCode(address) === "0x") throw new Error("That address has no contract code on the selected network.");
     const contract = new Contract(address, NPC_HOOD_ABI, provider);
-    const [name, symbol, owner, mintOpen, minted, maxSupply, maxPerTx, freeFee, paidPrice] = await Promise.all([
+    const [name, symbol, owner, mintOpen, minted, maxSupply, maxPerTx, freeFee, paidPrice, balance] = await Promise.all([
       contract.name(), contract.symbol(), contract.owner(), contract.mintOpen(), contract.totalMinted(), contract.MAX_SUPPLY(),
-      contract.MAX_PER_TX(), contract.FREE_MINT_FEE(), contract.PAID_MINT_PRICE(),
+      contract.MAX_PER_TX(), contract.FREE_MINT_FEE(), contract.PAID_MINT_PRICE(), provider.getBalance(address),
     ]);
     if (
       name !== "NPC HOOD" || symbol !== "HOOD" || BigInt(maxSupply) !== 10_000n ||
@@ -129,6 +130,7 @@ export default function OwnerDeploy() {
       maxPerTx: String(maxPerTx),
       freeFee: formatEther(freeFee),
       paidPrice: formatEther(paidPrice),
+      balance: formatEther(balance),
     };
     setContractStatus(result);
     setContractAddress(address);
@@ -303,6 +305,52 @@ export default function OwnerDeploy() {
     }
   };
 
+  const withdrawProceeds = async () => {
+    if (!contractAddress || !contractStatus) {
+      setStatusMessage("Load a contract address first.");
+      return;
+    }
+    if (!isOwner) {
+      setStatusMessage("Only the contract owner can withdraw proceeds.");
+      return;
+    }
+    if (Number(contractStatus.balance) <= 0) {
+      setStatusMessage("The contract has no BNB available to withdraw.");
+      return;
+    }
+    const confirmed = window.confirm(
+      `Withdraw ${contractStatus.balance} ${network.symbol} from this contract to the current owner wallet?\n\nThe wallet will ask you to approve the transaction and gas. Continue?`,
+    );
+    if (!confirmed) return;
+
+    setBusy(true);
+    setTxHash("");
+    try {
+      const provider = getProvider();
+      const chain = await provider.getNetwork();
+      if (Number(chain.chainId) !== selectedChainId) throw new Error(`Select ${network.name} in your wallet before withdrawing proceeds.`);
+      const signer = await provider.getSigner();
+      const signerAddress = await signer.getAddress();
+      const contract = new Contract(contractAddress, NPC_HOOD_ABI, signer);
+      const currentOwner = String(await contract.owner());
+      if (signerAddress.toLowerCase() !== currentOwner.toLowerCase()) {
+        throw new Error(`The active wallet is not the contract owner. Owner: ${currentOwner}`);
+      }
+      await contract.withdraw.staticCall();
+      const tx = await contract.withdraw();
+      setTxHash(tx.hash as string);
+      setStatusMessage("Withdraw request sent. Review and approve the transaction in your wallet…");
+      const receipt = await tx.wait();
+      if (!receipt || receipt.status !== 1) throw new Error("The withdraw transaction was not confirmed successfully.");
+      await readContract(contractAddress);
+      setStatusMessage(`Withdraw successful. Funds were sent to the owner wallet. Transaction: ${tx.hash}`);
+    } catch (error) {
+      setStatusMessage(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <main className="owner-deploy-page">
       <header className="owner-deploy-header">
@@ -366,6 +414,7 @@ export default function OwnerDeploy() {
               <div><span>SUPPLY</span><strong>{Number(contractStatus.minted).toLocaleString("en-US")} / {Number(contractStatus.maxSupply).toLocaleString("en-US")}</strong></div>
               <div><span>MAX / TX</span><strong>{contractStatus.maxPerTx}</strong></div>
               <div><span>FREE / PAID</span><strong>{contractStatus.freeFee} / {contractStatus.paidPrice} {network.symbol}</strong></div>
+              <div><span>CONTRACT BALANCE</span><strong>{contractStatus.balance} {network.symbol}</strong></div>
             </div>
             <div className="owner-owner-row"><span>OWNER ADDRESS</span><code>{contractStatus.owner}</code>{isOwner ? <span className="owner-badge"><Check size={12} /> WALLET OWNER</span> : <span className="owner-notice">The connected wallet is not the owner</span>}</div>
             <div className="owner-base-uri-update">
@@ -378,8 +427,9 @@ export default function OwnerDeploy() {
             <div className="owner-control-actions">
               <button className="owner-button owner-button-primary" onClick={() => changeMintState(true)} disabled={busy || !isOwner || !onSelectedNetwork || contractStatus.mintOpen}>Open mint manually</button>
               <button className="owner-button owner-button-danger" onClick={() => changeMintState(false)} disabled={busy || !isOwner || !onSelectedNetwork || !contractStatus.mintOpen}>Close mint</button>
+              <button className="owner-button owner-button-secondary" onClick={withdrawProceeds} disabled={busy || !isOwner || !onSelectedNetwork || Number(contractStatus.balance) <= 0}><ArrowDownToLine size={15} /> Withdraw proceeds</button>
             </div>
-            <p className="owner-warning"><ShieldCheck size={14} /> The deploy button does not open mint. The “Open mint manually” button asks for confirmation and then the owner wallet's signature.</p>
+            <p className="owner-warning"><ShieldCheck size={14} /> Withdraw sends the full contract balance to the current owner wallet. Every owner action requires wallet approval.</p>
           </>}
         </section>
 
